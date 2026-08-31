@@ -1,0 +1,25 @@
+<Project>
+  <PropertyGroup>
+
+    <!-- Target Framework -->
+    <TargetFramework>net10.0</TargetFramework>
+
+    <!-- Enable latest C# features and diagnostics -->
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Code quality & analysis -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest</AnalysisLevel>
+	  <AnalysisMode>All</AnalysisMode>
+
+    <!-- Prevent MSBuild from excluding common folders (optional) -->
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+
+    <NoWarn>CA1819;CA1711;CA2007;CS1997;CA1848;CA1040;CA1812</NoWarn>
+
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,1 @@
+global using MusicPlayer2_Avalonia.Domain.Common;

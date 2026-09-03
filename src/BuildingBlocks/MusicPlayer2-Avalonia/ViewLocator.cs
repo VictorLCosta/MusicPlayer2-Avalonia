@@ -6,9 +6,6 @@ using MusicPlayer2.Avalonia.ViewModels;
 
 namespace MusicPlayer2.Avalonia;
 
-/// <summary>
-/// Given a view model, returns the corresponding view if possible.
-/// </summary>
 [RequiresUnreferencedCode(
     "Default implementation of ViewLocator involves reflection which may be trimmed away.",
     Url = "https://docs.avaloniaui.net/docs/concepts/view-locator")]

@@ -1,0 +1,123 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  CONFIGURATION: Release
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  desktop:
+    name: Desktop (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Restore
+        run: dotnet restore src/Hosts/Desktop/MusicPlayer2-Avalonia.Desktop.csproj
+      - name: Build
+        run: dotnet build src/Hosts/Desktop/MusicPlayer2-Avalonia.Desktop.csproj --configuration $env:CONFIGURATION --no-restore
+
+  browser:
+    name: Browser (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Restore WebAssembly workload
+        run: dotnet workload restore src/Hosts/Browser/MusicPlayer2-Avalonia.Browser.csproj
+      - name: Restore
+        run: dotnet restore src/Hosts/Browser/MusicPlayer2-Avalonia.Browser.csproj
+      - name: Build
+        run: dotnet build src/Hosts/Browser/MusicPlayer2-Avalonia.Browser.csproj --configuration $env:CONFIGURATION --no-restore
+
+  android:
+    name: Android (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Restore Android workload
+        run: dotnet workload restore src/Hosts/Android/MusicPlayer2-Avalonia.Android.csproj
+      - name: Restore
+        run: dotnet restore src/Hosts/Android/MusicPlayer2-Avalonia.Android.csproj
+      - name: Build
+        run: dotnet build src/Hosts/Android/MusicPlayer2-Avalonia.Android.csproj --configuration $env:CONFIGURATION --no-restore
+
+  ios:
+    name: iOS (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Restore iOS workload
+        run: dotnet workload restore src/Hosts/iOS/MusicPlayer2-Avalonia.iOS.csproj
+      - name: Restore
+        run: dotnet restore src/Hosts/iOS/MusicPlayer2-Avalonia.iOS.csproj
+      - name: Build
+        run: dotnet build src/Hosts/iOS/MusicPlayer2-Avalonia.iOS.csproj --configuration $env:CONFIGURATION --no-restore
+
+  test:
+    name: Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Test
+        shell: pwsh
+        run: |
+          $testProjects = Get-ChildItem -Recurse -Filter '*.csproj' |
+            Where-Object {
+              $project = Get-Content -Raw $_.FullName
+              $project -match '<IsTestProject>\s*true\s*</IsTestProject>' -or
+              $project -match 'Microsoft.NET.Test.Sdk'
+            }
+
+          if (-not $testProjects) {
+            Write-Host 'No test projects were found. Skipping test execution.'
+            exit 0
+          }
+
+          foreach ($testProject in $testProjects) {
+            dotnet test $testProject.FullName --configuration $env:CONFIGURATION
+            if ($LASTEXITCODE -ne 0) {
+              exit $LASTEXITCODE
+            }
+          }

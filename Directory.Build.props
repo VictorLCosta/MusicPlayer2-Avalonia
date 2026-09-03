@@ -19,7 +19,7 @@
     <!-- Prevent MSBuild from excluding common folders (optional) -->
     <NoDefaultExcludes>true</NoDefaultExcludes>
 
-    <NoWarn>CA1819;CA1711;CA2007;CS1997;CA1848;CA1040;CA1812</NoWarn>
+    <NoWarn>CA1819;CA1711;CA2007;CS1997;CA1848;CA1040;CA1812;CA1707;CA1724</NoWarn>
 
   </PropertyGroup>
 </Project>

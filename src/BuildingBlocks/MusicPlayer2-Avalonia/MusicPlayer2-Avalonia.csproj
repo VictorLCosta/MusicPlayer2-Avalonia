@@ -12,4 +12,9 @@
     <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\MusicPlayer2-Avalonia.Application\MusicPlayer2-Avalonia.Application.csproj" />
+    <ProjectReference Include="..\MusicPlayer2-Avalonia.Infrastructure\MusicPlayer2-Avalonia.Infrastructure.csproj" />
+  </ItemGroup>
 </Project>

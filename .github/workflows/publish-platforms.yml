@@ -1,0 +1,255 @@
+name: Publish Platforms
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  CONFIGURATION: Release
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  desktop:
+    name: Desktop (${{ matrix.rid }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: macos-13
+            rid: osx-x64
+          - os: macos-14
+            rid: osx-arm64
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Publish
+        run: |
+          $publishDirectory = if ($env:RUNNER_OS -eq 'macOS') { 'artifacts/publish' } else { 'artifacts/package' }
+          dotnet publish src/Hosts/Desktop/MusicPlayer2-Avalonia.Desktop.csproj `
+            --configuration $env:CONFIGURATION `
+            --runtime ${{ matrix.rid }} `
+            --self-contained true `
+            -p:UseAppHost=true `
+            --output $publishDirectory
+
+      - name: Create macOS app bundle
+        if: startsWith(matrix.rid, 'osx-')
+        run: |
+          $appName = 'MusicPlayer2-Avalonia.Desktop'
+          $contentsDirectory = "artifacts/package/$appName.app/Contents"
+          $macOsDirectory = Join-Path $contentsDirectory 'MacOS'
+          New-Item -ItemType Directory -Force -Path $macOsDirectory | Out-Null
+          Copy-Item -Path 'artifacts/publish/*' -Destination $macOsDirectory -Recurse -Force
+          @"
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleExecutable</key>
+            <string>$appName</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.companyname.musicplayer2avalonia</string>
+            <key>CFBundleName</key>
+            <string>MusicPlayer2</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>CFBundleShortVersionString</key>
+            <string>1.0.0</string>
+            <key>CFBundleVersion</key>
+            <string>1</string>
+            <key>NSHighResolutionCapable</key>
+            <true/>
+          </dict>
+          </plist>
+          "@ | Set-Content -Path (Join-Path $contentsDirectory 'Info.plist') -NoNewline
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: MusicPlayer2-Avalonia-Desktop-${{ matrix.rid }}
+          path: artifacts/package
+          if-no-files-found: error
+          retention-days: 14
+
+  browser:
+    name: Browser
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Restore WebAssembly workload
+        run: dotnet workload restore src/Hosts/Browser/MusicPlayer2-Avalonia.Browser.csproj
+      - name: Publish
+        run: dotnet publish src/Hosts/Browser/MusicPlayer2-Avalonia.Browser.csproj --configuration $env:CONFIGURATION -p:PublishTrimmed=false
+      - name: Stage static site
+        run: |
+          $wwwroot = 'src/Hosts/Browser/bin/Release/net10.0-browser/publish/wwwroot'
+          if (-not (Test-Path $wwwroot)) {
+            throw "WebAssembly output was not found at $wwwroot."
+          }
+          New-Item -ItemType Directory -Force -Path artifacts/browser | Out-Null
+          Copy-Item -Path "$wwwroot/*" -Destination artifacts/browser -Recurse -Force
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: MusicPlayer2-Avalonia-Browser
+          path: artifacts/browser
+          if-no-files-found: error
+          retention-days: 14
+
+  android:
+    name: Android
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Restore Android workload
+        run: dotnet workload restore src/Hosts/Android/MusicPlayer2-Avalonia.Android.csproj
+
+      - name: Prepare signing key
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:ANDROID_KEYSTORE_BASE64) -or
+              [string]::IsNullOrWhiteSpace($env:ANDROID_KEY_ALIAS) -or
+              [string]::IsNullOrWhiteSpace($env:ANDROID_KEY_PASSWORD) -or
+              [string]::IsNullOrWhiteSpace($env:ANDROID_KEYSTORE_PASSWORD)) {
+            throw 'Android publishing requires the ANDROID_KEYSTORE_BASE64, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD, and ANDROID_KEYSTORE_PASSWORD secrets.'
+          }
+          $keyStorePath = Join-Path $env:RUNNER_TEMP 'android-release.keystore'
+          $keyPasswordPath = Join-Path $env:RUNNER_TEMP 'android-key-password.txt'
+          $keyStorePasswordPath = Join-Path $env:RUNNER_TEMP 'android-keystore-password.txt'
+          [System.IO.File]::WriteAllBytes($keyStorePath, [System.Convert]::FromBase64String($env:ANDROID_KEYSTORE_BASE64))
+          [System.IO.File]::WriteAllText($keyPasswordPath, $env:ANDROID_KEY_PASSWORD)
+          [System.IO.File]::WriteAllText($keyStorePasswordPath, $env:ANDROID_KEYSTORE_PASSWORD)
+          "ANDROID_KEYSTORE_PATH=$keyStorePath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "ANDROID_KEY_PASSWORD_FILE=$keyPasswordPath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "ANDROID_KEYSTORE_PASSWORD_FILE=$keyStorePasswordPath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Publish APK and AAB
+        run: |
+          dotnet publish src/Hosts/Android/MusicPlayer2-Avalonia.Android.csproj `
+            --framework net10.0-android `
+            --configuration $env:CONFIGURATION `
+            -p:AndroidKeyStore=true `
+            -p:AndroidSigningKeyStore=$env:ANDROID_KEYSTORE_PATH `
+            -p:AndroidSigningKeyAlias=$env:ANDROID_KEY_ALIAS `
+            -p:AndroidSigningKeyPass=file:$env:ANDROID_KEY_PASSWORD_FILE `
+            -p:AndroidSigningStorePass=file:$env:ANDROID_KEYSTORE_PASSWORD_FILE `
+            '-p:AndroidPackageFormats=aab;apk'
+
+      - name: Stage signed packages
+        run: |
+          $publishDirectory = 'src/Hosts/Android/bin/Release/net10.0-android/publish'
+          $packages = Get-ChildItem -Path $publishDirectory -Recurse -File |
+            Where-Object { $_.Extension -in '.aab', '.apk' }
+          if (-not $packages) {
+            throw 'No Android APK or AAB was produced.'
+          }
+          New-Item -ItemType Directory -Force -Path artifacts/android | Out-Null
+          $packages | Copy-Item -Destination artifacts/android
+          
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: MusicPlayer2-Avalonia-Android
+          path: artifacts/android
+          if-no-files-found: error
+          retention-days: 14
+
+  ios:
+    name: iOS (arm64)
+    runs-on: macos-14
+    env:
+      IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+      IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+      IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}
+      IOS_CODESIGN_KEY: ${{ secrets.IOS_CODESIGN_KEY }}
+      IOS_CODESIGN_PROVISION: ${{ secrets.IOS_CODESIGN_PROVISION }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Restore iOS workload
+        run: dotnet workload restore src/Hosts/iOS/MusicPlayer2-Avalonia.iOS.csproj
+      - name: Import signing certificate and provisioning profile
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:IOS_CERTIFICATE_BASE64) -or
+              [string]::IsNullOrWhiteSpace($env:IOS_CERTIFICATE_PASSWORD) -or
+              [string]::IsNullOrWhiteSpace($env:IOS_PROVISION_PROFILE_BASE64) -or
+              [string]::IsNullOrWhiteSpace($env:IOS_CODESIGN_KEY) -or
+              [string]::IsNullOrWhiteSpace($env:IOS_CODESIGN_PROVISION)) {
+            throw 'iOS publishing requires the IOS_CERTIFICATE_BASE64, IOS_CERTIFICATE_PASSWORD, IOS_PROVISION_PROFILE_BASE64, IOS_CODESIGN_KEY, and IOS_CODESIGN_PROVISION secrets.'
+          }
+          $keychainPassword = [guid]::NewGuid().ToString('N')
+          $keychainPath = Join-Path $env:RUNNER_TEMP 'build.keychain'
+          $certificatePath = Join-Path $env:RUNNER_TEMP 'certificate.p12'
+          $profilePath = Join-Path $env:RUNNER_TEMP 'profile.mobileprovision'
+          [System.IO.File]::WriteAllBytes($certificatePath, [System.Convert]::FromBase64String($env:IOS_CERTIFICATE_BASE64))
+          [System.IO.File]::WriteAllBytes($profilePath, [System.Convert]::FromBase64String($env:IOS_PROVISION_PROFILE_BASE64))
+          & security create-keychain -p $keychainPassword $keychainPath
+          & security set-keychain-settings -lut 21600 $keychainPath
+          & security unlock-keychain -p $keychainPassword $keychainPath
+          & security import $certificatePath -k $keychainPath -P $env:IOS_CERTIFICATE_PASSWORD -T /usr/bin/codesign
+          & security list-keychain -d user -s $keychainPath
+          & security set-key-partition-list -S apple-tool:,apple: -s -k $keychainPassword $keychainPath
+          $profileDirectory = Join-Path $env:HOME 'Library/MobileDevice/Provisioning Profiles'
+          New-Item -ItemType Directory -Force -Path $profileDirectory | Out-Null
+          Copy-Item $profilePath (Join-Path $profileDirectory 'MusicPlayer2-Avalonia.mobileprovision')
+      - name: Publish signed IPA
+        run: |
+          dotnet publish src/Hosts/iOS/MusicPlayer2-Avalonia.iOS.csproj `
+            --framework net10.0-ios `
+            --configuration $env:CONFIGURATION `
+            -p:ArchiveOnBuild=true `
+            -p:RuntimeIdentifier=ios-arm64 `
+            -p:CodesignKey=$env:IOS_CODESIGN_KEY `
+            -p:CodesignProvision=$env:IOS_CODESIGN_PROVISION
+      - name: Stage IPA
+        run: |
+          $publishDirectory = 'src/Hosts/iOS/bin/Release/net10.0-ios/ios-arm64/publish'
+          $ipa = Get-ChildItem -Path $publishDirectory -Filter '*.ipa' -File
+          if (-not $ipa) {
+            throw 'No iOS IPA was produced.'
+          }
+          New-Item -ItemType Directory -Force -Path artifacts/ios | Out-Null
+          $ipa | Copy-Item -Destination artifacts/ios
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: MusicPlayer2-Avalonia-iOS-ipa
+          path: artifacts/ios
+          if-no-files-found: error
+          retention-days: 14

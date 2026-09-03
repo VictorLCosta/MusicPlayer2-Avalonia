@@ -5,8 +5,22 @@ public interface IMetaDataReader
     Task<AudioMetadata> Read(string filePath, CancellationToken cancellationToken = default);
 }
 
-public sealed class MetadataReadException(string filePath, Exception innerException)
-    : Exception($"Nao foi possivel ler os metadados de '{filePath}'.", innerException);
+public sealed class MetadataReadException : Exception
+{
+    public MetadataReadException()
+    {
+    }
+
+    public MetadataReadException(string? message)
+        : base(message)
+    {
+    }
+
+    public MetadataReadException(string? message, Exception? innerException)
+        : base(message, innerException)
+    {
+    }
+}
 
 public sealed record AudioMetadata(
     string Title,

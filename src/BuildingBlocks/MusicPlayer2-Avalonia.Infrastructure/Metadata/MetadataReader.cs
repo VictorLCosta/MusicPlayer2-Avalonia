@@ -40,7 +40,9 @@ public class MetadataReader : IMetaDataReader
         }
         catch (Exception exception)
         {
-            throw new MetadataReadException(filePath, exception);
+            throw new MetadataReadException(
+                $"Nao foi possivel ler os metadados de '{filePath}'.",
+                exception);
         }
     }
 }

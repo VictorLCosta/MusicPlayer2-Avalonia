@@ -1,0 +1,12 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="using:MusicPlayer2_Avalonia">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceInclude Source="avares://MusicPlayer2-Avalonia/Styles/Window/CustomWindow.axaml" />
+  </ResourceDictionary.MergedDictionaries>
+
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceInclude Source="avares://MusicPlayer2-Avalonia/Styles/Themes/Light.axaml" x:Key="Light" />
+    <ResourceInclude Source="avares://MusicPlayer2-Avalonia/Styles/Themes/Dark.axaml" x:Key="Dark" />
+    <ResourceInclude Source="avares://MusicPlayer2-Avalonia/Styles/Themes/Original.axaml" x:Key="{x:Static local:AppThemes.Original}" />
+  </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

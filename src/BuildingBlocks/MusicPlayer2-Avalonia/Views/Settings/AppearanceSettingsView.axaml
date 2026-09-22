@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:MusicPlayer2_Avalonia.ViewModels.Settings"
+             xmlns:settings="using:MusicPlayer2_Avalonia.Application.Settings.Models"
+             x:Class="MusicPlayer2_Avalonia.Views.Settings.AppearanceSettingsView"
+             x:DataType="vm:AppearanceSettingsViewModel">
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="14" Margin="20" MaxWidth="560" HorizontalAlignment="Stretch">
+      <TextBlock Text="Aparência" FontSize="22" FontWeight="SemiBold" />
+      <TextBlock Text="Tema" FontWeight="SemiBold" />
+      <ComboBox HorizontalAlignment="Stretch"
+                SelectedValue="{Binding Theme, Mode=TwoWay}"
+                SelectedValueBinding="{ReflectionBinding Tag}">
+        <ComboBoxItem Content="Seguir o sistema" Tag="{x:Static settings:AppTheme.System}" />
+        <ComboBoxItem Content="Claro" Tag="{x:Static settings:AppTheme.Light}" />
+        <ComboBoxItem Content="Escuro" Tag="{x:Static settings:AppTheme.Dark}" />
+      </ComboBox>
+      <TextBlock Text="Cor de destaque" FontWeight="SemiBold" />
+      <TextBox Text="{Binding AccentColor, Mode=TwoWay}" PlaceholderText="#RRGGBB"
+               AutomationProperties.Name="Cor de destaque" />
+      <TextBlock Text="Deixe em branco para usar a cor do tema." TextWrapping="Wrap"
+                 Foreground="{DynamicResource Theme.Brush.TextMuted}" />
+      <CheckBox IsChecked="{Binding ShowAlbumCover, Mode=TwoWay}" Content="Mostrar capa do álbum" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,7 +1,8 @@
-using MusicPlayer2_Avalonia.Application.Common;
-using MusicPlayer2_Avalonia.Domain.Entities;
-
 using Microsoft.EntityFrameworkCore;
+
+using MusicPlayer2_Avalonia.Application.Common;
+using MusicPlayer2_Avalonia.Application.Settings;
+using MusicPlayer2_Avalonia.Domain.Entities;
 
 namespace MusicPlayer2_Avalonia.Application.Player;
 
@@ -10,16 +11,28 @@ public sealed class PlayerService : IDisposable
     private readonly IAudioEngine _audioEngine;
     private readonly IMusicPlayerDbContext _dbContext;
     private readonly PlaybackQueue _playbackQueue;
+    private readonly AudioOutputService _audioOutput;
+    private readonly SettingsService _settings;
+    private readonly PlaybackSessionStore _sessionStore;
+    private TimeSpan? _resumePosition;
+    private bool _sessionRestored;
+    private bool _sessionReady;
     private bool _disposed;
 
     public PlayerService(
         IAudioEngine audioEngine,
         IMusicPlayerDbContext dbContext,
-        PlaybackQueue playbackQueue)
+        PlaybackQueue playbackQueue,
+        AudioOutputService audioOutput,
+        SettingsService settings,
+        PlaybackSessionStore sessionStore)
     {
         _audioEngine = audioEngine;
         _dbContext = dbContext;
         _playbackQueue = playbackQueue;
+        _audioOutput = audioOutput;
+        _settings = settings;
+        _sessionStore = sessionStore;
         _audioEngine.PlaybackEnded += OnPlaybackEnded;
     }
 
@@ -27,7 +40,9 @@ public sealed class PlayerService : IDisposable
 
     public bool IsPlaying => _audioEngine.IsPlaying;
 
-    public TimeSpan Position => _audioEngine.Position;
+    public IAudioSpectrumSource? SpectrumSource => _audioEngine as IAudioSpectrumSource;
+
+    public TimeSpan Position => _resumePosition ?? _audioEngine.Position;
 
     public TimeSpan Duration => _audioEngine.Duration;
 
@@ -54,12 +69,19 @@ public sealed class PlayerService : IDisposable
             throw new InvalidOperationException("Nenhuma faixa foi carregada.");
         }
 
-        _audioEngine.Play();
+        if (_resumePosition is { } position)
+        {
+            _audioEngine.PlayFrom(position);
+            _resumePosition = null;
+        }
+        else
+            _audioEngine.Play();
     }
 
     public void Stop()
     {
         _audioEngine.StopAudio();
+        _resumePosition = null;
         CurrentTrack = null;
     }
 
@@ -67,6 +89,7 @@ public sealed class PlayerService : IDisposable
         Guid playlistId,
         CancellationToken cancellationToken = default)
     {
+        await _settings.LoadAsync(cancellationToken).ConfigureAwait(false);
         var playlist = await _dbContext.Playlists
             .Include(entity => entity.PlaylistItems)
             .AsNoTracking()
@@ -77,6 +100,10 @@ public sealed class PlayerService : IDisposable
         _playbackQueue.Replace(playlist.PlaylistItems
             .OrderBy(item => item.Position)
             .Select(item => item.TrackId));
+        if (!_settings.Current.ContinuePlaybackOnPlaylistChange)
+            Stop();
+        else if (CurrentTrack is { } current && _playbackQueue.TrackIds.Contains(current.Id))
+            _playbackQueue.SetCurrent(current.Id);
     }
 
     public async Task NextAsync(CancellationToken cancellationToken = default)
@@ -103,7 +130,53 @@ public sealed class PlayerService : IDisposable
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(position, TimeSpan.Zero);
 
-        _audioEngine.Seek(position);
+        if (_resumePosition is not null)
+            _resumePosition = position;
+        else
+            _audioEngine.Seek(position);
+    }
+
+    public async Task RestoreSessionAsync()
+    {
+        if (_sessionRestored) return;
+        _sessionRestored = true;
+        try { await RestoreSessionCoreAsync().ConfigureAwait(false); }
+        finally { _sessionReady = true; }
+    }
+
+    private async Task RestoreSessionCoreAsync()
+    {
+        var settings = await _settings.LoadAsync().ConfigureAwait(false);
+        if (!settings.RememberPlaybackPosition)
+        {
+            await _sessionStore.SaveAsync(null).ConfigureAwait(false);
+            return;
+        }
+        var session = await _sessionStore.LoadAsync().ConfigureAwait(false);
+        if (session?.TrackId is not { } trackId) return;
+        var track = await _dbContext.Tracks.Include(item => item.Artist).Include(item => item.Album)
+            .FirstOrDefaultAsync(item => item.Id == trackId).ConfigureAwait(false);
+        if (track is null || !File.Exists(track.Source.Path)) return;
+        await _audioEngine.LoadAsync(new Uri(track.Source.Path)).ConfigureAwait(false);
+        var position = double.IsFinite(session.PositionSeconds) ? session.PositionSeconds : 0;
+        _resumePosition = TimeSpan.FromSeconds(Math.Clamp(position, 0, Math.Max(0, track.Duration.TotalSeconds - 1)));
+        var queueIds = session.Queue ?? [];
+        var existingIds = await _dbContext.Tracks.Where(item => queueIds.Contains(item.Id))
+            .Select(item => item.Id).ToListAsync().ConfigureAwait(false);
+        _playbackQueue.Replace(queueIds.Where(existingIds.Contains));
+        _playbackQueue.SetCurrent(trackId);
+        CurrentTrack = track;
+    }
+
+    public Task SaveSessionAsync()
+    {
+        if (!_sessionReady && CurrentTrack is null) return Task.CompletedTask;
+        var seconds = Math.Max(0, Position.TotalSeconds);
+        if (!double.IsFinite(seconds)) seconds = 0;
+        if (CurrentTrack is { } track && seconds >= track.Duration.TotalSeconds - 1) seconds = 0;
+        return _sessionStore.SaveAsync(_settings.Current.RememberPlaybackPosition && CurrentTrack is not null
+            ? new PlaybackSession(CurrentTrack.Id, seconds, _playbackQueue.TrackIds.ToArray())
+            : null);
     }
 
     public void Dispose()
@@ -119,7 +192,12 @@ public sealed class PlayerService : IDisposable
 
     private async Task LoadAndPlayAsync(Guid trackId, CancellationToken cancellationToken)
     {
+        await _settings.LoadAsync(cancellationToken).ConfigureAwait(false);
+        if (CurrentTrack is not null)
+            await SaveSessionAsync().ConfigureAwait(false);
         var track = await _dbContext.Tracks
+            .Include(item => item.Artist)
+            .Include(item => item.Album)
             .FirstOrDefaultAsync(item => item.Id == trackId, cancellationToken)
             .ConfigureAwait(false)
             ?? throw new KeyNotFoundException($"Track '{trackId}' was not found.");
@@ -131,7 +209,9 @@ public sealed class PlayerService : IDisposable
                 track.Source.Path);
         }
 
+        await _audioOutput.InitializeAsync().ConfigureAwait(false);
         await _audioEngine.LoadAsync(new Uri(track.Source.Path)).ConfigureAwait(false);
+        _resumePosition = null;
         _audioEngine.Play();
         CurrentTrack = track;
     }

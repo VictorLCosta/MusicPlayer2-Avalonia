@@ -8,7 +8,7 @@
             "name": ".NET Core Launch (console)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build-desktop",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/src/Hosts/Desktop/bin/Debug/net10.0/MusicPlayer2-Avalonia.Desktop.dll",
             "args": [],

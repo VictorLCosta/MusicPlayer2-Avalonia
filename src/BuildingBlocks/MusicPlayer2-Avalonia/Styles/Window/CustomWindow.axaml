@@ -1,0 +1,95 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="using:MusicPlayer2_Avalonia.Styles.Window">
+
+  <ControlTheme TargetType="WindowDrawnDecorations" x:Key="SuppressedDecorationsTheme">
+    <Setter Property="DefaultFrameThickness" Value="5" />
+    <Setter Property="Template">
+        <WindowDrawnDecorationsTemplate>
+            <WindowDrawnDecorationsContent />
+        </WindowDrawnDecorationsTemplate>
+    </Setter>
+  </ControlTheme>
+              
+  <ControlTheme TargetType="{x:Type local:CustomWindow}"
+                x:Key="{x:Type local:CustomWindow}">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="TransparencyLevelHint" Value="AcrylicBlur,Blur,None" />
+    <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Theme.Brush.Fallback}" />
+    <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text}" />
+    <Setter Property="TitleBarHeight" Value="36" />
+    <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
+    <Setter Property="WindowDecorations" Value="{OnPlatform BorderOnly, macOS=Full, x:TypeArguments=WindowDecorations}" />
+    <Setter Property="WindowDecorationsTheme" Value="{StaticResource SuppressedDecorationsTheme}" />
+    <Setter Property="ShowWindowControls" Value="{OnPlatform True, macOS=False, x:TypeArguments=x:Boolean}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="PART_Root" Background="{TemplateBinding Background}"
+                BorderBrush="{DynamicResource Theme.Brush.Divider}"
+                BorderThickness="1"
+                ClipToBounds="True"
+                CornerRadius="{TemplateBinding RootCornerRadius}">
+          <Grid>
+            <Border Background="{DynamicResource Theme.Brush.Backdrop}" IsHitTestVisible="False" />
+            <Border ClipToBounds="True" IsHitTestVisible="False">
+              <Image Source="{TemplateBinding BackdropImage}" Stretch="UniformToFill" Margin="-48">
+                <Image.Effect>
+                  <BlurEffect Radius="48" />
+                </Image.Effect>
+              </Image>
+            </Border>
+            <Border Background="{DynamicResource Theme.Brush.Overlay}" IsHitTestVisible="False"
+                    IsVisible="{Binding BackdropImage, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static ObjectConverters.IsNotNull}}" />
+          <VisualLayerManager IsHitTestVisible="True">
+            <Grid RowDefinitions="Auto,*">
+              <Border Name="PART_TitleBar"
+                      Grid.Row="0"
+                      Height="{TemplateBinding TitleBarHeight}"
+                      IsVisible="{TemplateBinding IsTitleBarVisible}"
+                      Background="{DynamicResource Theme.Brush.TitleBar}"
+                      BorderBrush="{DynamicResource Theme.Brush.Divider}"
+                      BorderThickness="0,0,0,1"
+                      Padding="{OnPlatform '12,0', macOS='84,0,12,0', x:TypeArguments=Thickness}">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto"
+                      VerticalAlignment="Center">
+                  <TextBlock Grid.Column="0"
+                             Text="♫"
+                             Foreground="{DynamicResource Theme.Brush.Text}"
+                             FontSize="11"
+                             FontWeight="SemiBold"
+                             VerticalAlignment="Center" />
+                  <TextBlock Grid.Column="1"
+                             Margin="8,0,12,0"
+                             Text="{TemplateBinding Title}"
+                             FontSize="{TemplateBinding TitleFontSize}"
+                             Foreground="{DynamicResource Theme.Brush.Text}"
+                             TextTrimming="CharacterEllipsis"
+                             VerticalAlignment="Center" />
+                  <ContentPresenter Grid.Column="2"
+                                    WindowDecorationProperties.ElementRole="User"
+                                    Content="{TemplateBinding RightWindowTitleBarContent}"
+                                    VerticalContentAlignment="Center" />
+                  <StackPanel Grid.Column="3"
+                              Orientation="Horizontal"
+                              Spacing="4"
+                              IsVisible="{TemplateBinding ShowWindowControls}"
+                              Margin="12,0,0,0">
+                    <Button Name="PART_MinimizeButton" WindowDecorationProperties.ElementRole="MinimizeButton" Classes="window-control" Content="−" ToolTip.Tip="Minimizar" />
+                    <Button Name="PART_MaximizeButton" Classes="window-control" Content="□" ToolTip.Tip="Maximizar ou restaurar" />
+                    <Button Name="PART_CloseButton" WindowDecorationProperties.ElementRole="CloseButton" Classes="window-control close" Content="×" ToolTip.Tip="Fechar" />
+                  </StackPanel>
+                </Grid>
+              </Border>
+              <ContentPresenter Grid.Row="1"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </Grid>
+          </VisualLayerManager>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

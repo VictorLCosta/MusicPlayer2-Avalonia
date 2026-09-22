@@ -2,17 +2,29 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
-  
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <InternalsVisibleTo Include="MusicPlayer2-Avalonia.Settings.Tests" />
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Avalonia" />
-    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Controls.ItemsRepeater" />
+    <PackageReference Include="Avalonia.Themes.Simple" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="DynamicData" />
+    <PackageReference Include="HotAvalonia" PrivateAssets="All" Publish="True" />
+    <PackageReference Include="Lucide.Avalonia" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="System.Reactive.Linq" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\MusicPlayer2-Avalonia.Application\MusicPlayer2-Avalonia.Application.csproj" />
     <ProjectReference Include="..\MusicPlayer2-Avalonia.Infrastructure\MusicPlayer2-Avalonia.Infrastructure.csproj" />

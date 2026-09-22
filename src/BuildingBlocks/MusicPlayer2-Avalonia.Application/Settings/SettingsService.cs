@@ -1,35 +1,60 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
+
+using MusicPlayer2_Avalonia.Application.Common.Storage;
 
 using MusicPlayer2_Avalonia.Application.Settings.Models;
 
 namespace MusicPlayer2_Avalonia.Application.Settings;
 
-public sealed class SettingsService
+public sealed class SettingsService(IAppStorage storage) : IDisposable
 {
-    private static readonly string SettingsPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "MusicPlayer2",
-        "settings.json");
+    private readonly SemaphoreSlim _gate = new(1, 1);
+    private bool _loaded;
+    public AppSettings Current { get; private set; } = new();
+    public event EventHandler? Changed;
 
-    private static readonly JsonSerializerOptions JsonSerializerOptions = new () { 
-        WriteIndented = true 
-    };
-
-    public static AppSettings Load()
+    public async Task<AppSettings> LoadAsync(CancellationToken cancellationToken = default)
     {
-        if (!File.Exists(SettingsPath))
-            return new AppSettings();
-
-        var json = File.ReadAllText(SettingsPath);
-        return JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
+        await _gate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        var changed = false;
+        try
+        {
+            if (!_loaded)
+            {
+                var bytes = await storage.ReadBytesAsync(AppStorageFiles.Settings, cancellationToken).ConfigureAwait(false);
+                Current = bytes is null ? new AppSettings()
+                    : JsonSerializer.Deserialize(bytes, SettingsJsonContext.Default.AppSettings)
+                      ?? throw new InvalidDataException("The settings document is null.");
+                _loaded = true;
+                changed = true;
+            }
+        }
+        finally { _gate.Release(); }
+        if (changed) Changed?.Invoke(this, EventArgs.Empty);
+        return Current;
     }
 
-    public static void Save(AppSettings settings)
+    public async Task SaveAsync(AppSettings settings, CancellationToken cancellationToken = default)
     {
-        var directory = Path.GetDirectoryName(SettingsPath)!;
-        Directory.CreateDirectory(directory);
-
-        var json = JsonSerializer.Serialize(settings, JsonSerializerOptions);
-        File.WriteAllText(SettingsPath, json);
+        ArgumentNullException.ThrowIfNull(settings);
+        await _gate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            var snapshot = settings with { LibraryFolders = settings.LibraryFolders.ToArray() };
+            await storage.WriteBytesAsync(AppStorageFiles.Settings,
+                JsonSerializer.SerializeToUtf8Bytes(snapshot, SettingsJsonContext.Default.AppSettings), cancellationToken)
+                .ConfigureAwait(false);
+            Current = snapshot;
+            _loaded = true;
+        }
+        finally { _gate.Release(); }
+        Changed?.Invoke(this, EventArgs.Empty);
     }
+
+    public void Dispose() => _gate.Dispose();
 }
+
+[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSerializable(typeof(AppSettings))]
+internal sealed partial class SettingsJsonContext : JsonSerializerContext;

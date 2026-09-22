@@ -1,9 +1,11 @@
-using Foundation;
-using UIKit;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.iOS;
-using Avalonia.Media;
+
+#if HOTAVALONIA_ENABLE
+using HotAvalonia;
+#endif
+
+using MusicPlayer2_Avalonia;
 
 namespace MusicPlayer2.Avalonia.iOS;
 
@@ -16,7 +18,13 @@ internal sealed partial class AppDelegate : AvaloniaAppDelegate<App>
 {
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
     {
-        return base.CustomizeAppBuilder(builder)
+        var configuredBuilder = base.CustomizeAppBuilder(builder)
             .WithInterFont();
+
+#if HOTAVALONIA_ENABLE
+        configuredBuilder = configuredBuilder.UseHotReload();
+#endif
+
+        return configuredBuilder;
     }
 }

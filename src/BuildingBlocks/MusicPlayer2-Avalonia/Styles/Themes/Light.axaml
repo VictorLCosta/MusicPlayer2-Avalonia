@@ -1,0 +1,36 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Color x:Key="ThemeAccentColor">#7BBDFF</Color>
+  <SolidColorBrush x:Key="ThemeAccentBrush" Color="{DynamicResource ThemeAccentColor}" />
+
+  <SolidColorBrush x:Key="Theme.Brush.Text" Color="#006BD7" />
+  <SolidColorBrush x:Key="Theme.Brush.TextMuted" Color="#007FFE" />
+  <SolidColorBrush x:Key="Theme.Brush.Secondary" Color="#6BB5FF" />
+  <SolidColorBrush x:Key="Theme.Brush.Highlight" Color="#007FFE" />
+  <SolidColorBrush x:Key="Theme.Brush.Icon" Color="#6E6E6E" />
+  <SolidColorBrush x:Key="Theme.Brush.Danger" Color="#006BD7" />
+  <SolidColorBrush x:Key="Theme.Brush.Background" Color="#FFFFFF" />
+  <SolidColorBrush x:Key="Theme.Brush.Fallback" Color="#FFFFFF" />
+  <SolidColorBrush x:Key="Theme.Brush.Overlay" Color="#CCFFFFFF" />
+  <SolidColorBrush x:Key="Theme.Brush.TitleBar" Color="#88E9F4FF" />
+  <SolidColorBrush x:Key="Theme.Brush.Toolbar" Color="#88E9F4FF" />
+  <SolidColorBrush x:Key="Theme.Brush.Input" Color="#CCE9F4FF" />
+  <SolidColorBrush x:Key="Theme.Brush.Button" Color="#88ABD5FF" />
+  <SolidColorBrush x:Key="Theme.Brush.ButtonHover" Color="#888BC5FF" />
+  <SolidColorBrush x:Key="Theme.Brush.ButtonPressed" Color="#886BB5FF" />
+  <SolidColorBrush x:Key="Theme.Brush.Divider" Color="#88E9F4FF" />
+  <SolidColorBrush x:Key="Theme.Brush.Cover" Color="#64ABD5FF" />
+  <SolidColorBrush x:Key="Theme.Brush.ListRow" Color="#66E9F4FF" />
+  <SolidColorBrush x:Key="Theme.Brush.ListSelected" Color="#41ABD5FF" />
+  <SolidColorBrush x:Key="Theme.Brush.Accent" Color="{DynamicResource ThemeAccentColor}" />
+  <SolidColorBrush x:Key="Theme.Brush.ProgressTrack" Color="#50C5E2FF" />
+  <SolidColorBrush x:Key="Theme.Brush.Scrollbar" Color="#ABD5FF" />
+
+  <LinearGradientBrush x:Key="Theme.Brush.Backdrop" StartPoint="0%,0%" EndPoint="70%,100%">
+    <GradientStop Color="#E1DDE8" Offset="0" />
+    <GradientStop Color="#ECE3DF" Offset="0.5" />
+    <GradientStop Color="#E7DBC7" Offset="1" />
+  </LinearGradientBrush>
+  <ExperimentalAcrylicMaterial x:Key="Theme.AcrylicMaterial" TintColor="#FFFFFF"
+                               TintOpacity="1" MaterialOpacity="0.8" FallbackColor="#FFFFFF" />
+</ResourceDictionary>

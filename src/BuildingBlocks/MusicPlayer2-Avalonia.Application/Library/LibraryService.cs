@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 using MusicPlayer2_Avalonia.Application.Common;
 using MusicPlayer2_Avalonia.Application.Library.Models;
+using MusicPlayer2_Avalonia.Application.Playlist.Models;
 using MusicPlayer2_Avalonia.Domain.Entities;
 using MusicPlayer2_Avalonia.Domain.ValueObjects;
 
@@ -11,6 +12,23 @@ public sealed class LibraryService(
     IMusicPlayerDbContext dbContext,
     IMetaDataReader metaDataReader)
 {
+    public async Task<IReadOnlyList<ListTrackDto>> GetTracksAsync(CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Tracks
+            .AsNoTracking()
+            .OrderBy(track => track.Title)
+            .Select(track => new ListTrackDto(
+                Guid.Empty,
+                track.Id,
+                0,
+                track.Title,
+                track.Artist != null ? track.Artist.Name : null,
+                track.Album != null ? track.Album.Title : null,
+                track.Duration,
+                track.SourceFileSizeBytes ?? 0))
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+    }
     private const int SaveBatchSize = 100;
 
     private static readonly HashSet<string> SupportedAudioExtensions = new(StringComparer.OrdinalIgnoreCase)
@@ -62,7 +80,7 @@ public sealed class LibraryService(
                 track.SourceLastWriteTimeUtc))
             .ToDictionaryAsync(track => track.Path, StringComparer.OrdinalIgnoreCase, cancellationToken)
             .ConfigureAwait(false);
-            
+
         var lookup = await CreateLookupAsync(cancellationToken).ConfigureAwait(false);
 
         int added = 0;
@@ -161,6 +179,32 @@ public sealed class LibraryService(
             .ConfigureAwait(false);
 
         return tracks;
+    }
+
+    public async Task<int> RemoveMissingTracksAsync(string directoryPath, CancellationToken cancellationToken = default)
+    {
+        var root = Path.TrimEndingDirectorySeparator(Path.GetFullPath(directoryPath)) + Path.DirectorySeparatorChar;
+        // An unavailable drive or root must never be treated as a deleted collection.
+        if (!Directory.Exists(root)) return 0;
+        var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        var tracks = await dbContext.Tracks.ToListAsync(cancellationToken).ConfigureAwait(false);
+        var missing = new List<Track>();
+        foreach (var track in tracks.Where(track => track.Source.Path.StartsWith(root, comparison)))
+        {
+            try { _ = File.GetAttributes(track.Source.Path); }
+            catch (FileNotFoundException) { missing.Add(track); }
+            catch (DirectoryNotFoundException) { missing.Add(track); }
+            catch (UnauthorizedAccessException) { }
+            catch (IOException) { }
+        }
+        if (missing.Count == 0) return 0;
+        var ids = missing.Select(track => track.Id).ToArray();
+        var playlistItems = await dbContext.PlaylistItems.Where(item => ids.Contains(item.TrackId))
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        foreach (var item in playlistItems) dbContext.Remove(item);
+        foreach (var track in missing) dbContext.Remove(track);
+        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        return missing.Count;
     }
 
     private async Task ImportOrUpdateAsync(

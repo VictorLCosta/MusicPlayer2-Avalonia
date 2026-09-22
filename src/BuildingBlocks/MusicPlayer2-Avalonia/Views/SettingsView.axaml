@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MusicPlayer2_Avalonia.ViewModels"
+             xmlns:models="using:MusicPlayer2_Avalonia.Models"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="MusicPlayer2_Avalonia.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+  <Grid RowDefinitions="* Auto">
+    <Grid ColumnDefinitions="Auto *" Background="Transparent"
+          IsEnabled="{Binding CanEdit}">
+      <Border Grid.Column="0" Padding="8" BorderThickness="0,0,1,0"
+              BorderBrush="{DynamicResource Theme.Brush.Divider}">
+        <ListBox ItemsSource="{Binding SettingsMenuItems}"
+                SelectedItem="{Binding SelectedMenuItem}"
+                Background="Transparent">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="models:MenuItem">
+              <StackPanel Orientation="Horizontal" Spacing="8" Margin="4,6">
+                <LucideIcon Kind="{Binding Icon}" Size="18" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Title}" VerticalAlignment="Center" />
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Border>
+
+      <TransitioningContentControl Grid.Column="1" 
+                                  Padding="8,0" 
+                                  Content="{Binding CurrentPage}" />
+    </Grid>
+
+    <Border Grid.Row="1"
+            BorderBrush="{DynamicResource Theme.Brush.Divider}" 
+            BorderThickness="0,1,0,0">
+      <StackPanel Spacing="8" 
+                  Margin="12">
+        <TextBlock Text="Carregando ou salvando configurações…" IsVisible="{Binding IsBusy}" />
+        <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"
+                   IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}"
+                   Foreground="{DynamicResource Theme.Brush.Danger}" />
+        <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap"
+                 IsVisible="{Binding StatusMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                 
+        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+          <Button Content="Voltar ao player" Click="BackToPlayerClicked" />
+          <Button Content="Carregar configurações" Command="{Binding LoadSettingsCommand}"
+                  IsVisible="{Binding !IsLoaded}" />
+          <Button Command="{Binding CancelSettingsCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <LucideIcon Kind="CircleX" />
+              <TextBlock Text="Cancelar" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+          <Button Command="{Binding SaveSettingsCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <LucideIcon Kind="SaveCheck" />
+              <TextBlock Text="Aplicar" VerticalAlignment="Center" />
+            </StackPanel>
+          </Button>
+        </StackPanel>
+      </StackPanel>
+    </Border>
+  </Grid>
+
+</UserControl>

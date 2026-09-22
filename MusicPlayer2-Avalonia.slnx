@@ -1,10 +1,10 @@
 <Solution>
   <Folder Name="/src/" />
   <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/MusicPlayer2-Avalonia/MusicPlayer2-Avalonia.csproj" />
     <Project Path="src/BuildingBlocks/MusicPlayer2-Avalonia.Application/MusicPlayer2-Avalonia.Application.csproj" />
     <Project Path="src/BuildingBlocks/MusicPlayer2-Avalonia.Domain/MusicPlayer2-Avalonia.Domain.csproj" />
     <Project Path="src/BuildingBlocks/MusicPlayer2-Avalonia.Infrastructure/MusicPlayer2-Avalonia.Infrastructure.csproj" />
-    <Project Path="src/BuildingBlocks/MusicPlayer2-Avalonia/MusicPlayer2-Avalonia.csproj" />
   </Folder>
   <Folder Name="/src/Hosts/" />
   <Folder Name="/src/Hosts/Android/">

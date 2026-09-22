@@ -1,22 +1,44 @@
-using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
+using Avalonia.Styling;
+using Avalonia.Threading;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using MusicPlayer2.Avalonia.ViewModels;
-using MusicPlayer2.Avalonia.Views;
-
-using MusicPlayer2_Avalonia;
-
 using MusicPlayer2_Avalonia.Application;
+using MusicPlayer2_Avalonia.Application.Common.Storage;
+using MusicPlayer2_Avalonia.Application.Player;
+using MusicPlayer2_Avalonia.Application.Settings;
+using MusicPlayer2_Avalonia.Application.Settings.Models;
 using MusicPlayer2_Avalonia.Infrastructure;
+using MusicPlayer2_Avalonia.ViewModels;
+using MusicPlayer2_Avalonia.Views;
 
-namespace MusicPlayer2.Avalonia;
+using AvaloniaApplication = Avalonia.Application;
 
-public partial class App : Application
+namespace MusicPlayer2_Avalonia;
+
+public partial class App : AvaloniaApplication
 {
     private IServiceProvider _serviceProvider = null!;
+    private readonly Action<IServiceCollection>? _configureServices;
+    private readonly IServiceProvider? _providedServices;
+    private SettingsService? _settings;
+
+    public App()
+    {
+    }
+
+    public App(Action<IServiceCollection> configureServices)
+    {
+        _configureServices = configureServices;
+    }
+
+    public App(IServiceProvider services)
+    {
+        _providedServices = services;
+    }
 
     public override void Initialize()
     {
@@ -25,38 +47,94 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        var collection = new ServiceCollection();
+        if (_providedServices is not null)
+        {
+            _serviceProvider = _providedServices;
+        }
+        else
+        {
+            var collection = new ServiceCollection();
 
-        collection.AddApplicationServices();
-        collection.AddInfrastructureServices("");
-        collection.AddUIServices();
+            collection.AddUIServices();
+            collection.AddApplicationServices();
+            collection.AddInfrastructureServices();
 
-        _serviceProvider = collection.BuildServiceProvider();
+            _configureServices?.Invoke(collection);
+
+            _serviceProvider = collection.BuildServiceProvider();
+
+            if (!Avalonia.Controls.Design.IsDesignMode)
+                _serviceProvider.InitializeDatabaseAsync().GetAwaiter().GetResult();
+        }
+
+        if (!Avalonia.Controls.Design.IsDesignMode)
+        {
+            _ = _serviceProvider.GetRequiredService<AudioOutputService>().InitializeAsync();
+            _settings = _serviceProvider.GetRequiredService<SettingsService>();
+            _settings.Changed += SettingsChanged;
+            _ = InitializeAppearanceAsync();
+        }
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainViewModel()
+                DataContext = _serviceProvider.GetRequiredService<MainWindowViewModel>(),
+                StateStorage = _serviceProvider.GetRequiredService<IAppStorage>(),
+                SaveWindowState = true,
+                Settings = _settings,
+                Player = _serviceProvider.GetRequiredService<PlayerService>(),
+            };
+        }
+        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
+        {
+            singleViewPlatform.MainView = new MainView
+            {
+                DataContext = _serviceProvider.GetRequiredService<MainViewModel>(),
             };
         }
         else if (ApplicationLifetime is IActivityApplicationLifetime activity)
         {
-            activity.MainViewFactory = CreateMainView;
-        }
-        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
-        {
-            singleViewPlatform.MainView = CreateMainView();
+            activity.MainViewFactory = () => new MainView { DataContext = _serviceProvider.GetRequiredService<MainViewModel>() };
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
-    private static MainView CreateMainView()
+    private async Task InitializeAppearanceAsync()
     {
-        return new MainView
+        try
         {
-            DataContext = new MainViewModel()
+            if (_settings is not null) await _settings.LoadAsync();
+            ApplyAppearance();
+        }
+        catch (Exception)
+        {
+            // The settings page and library display load failures; keep the default appearance usable.
+            RequestedThemeVariant = ThemeVariant.Default;
+        }
+    }
+
+    private void SettingsChanged(object? sender, EventArgs e) => Dispatcher.UIThread.Post(ApplyAppearance);
+
+    private void ApplyAppearance()
+    {
+        var settings = _settings?.Current ?? new AppSettings();
+        RequestedThemeVariant = settings.Theme switch
+        {
+            AppTheme.Light => ThemeVariant.Light,
+            AppTheme.Dark => ThemeVariant.Dark,
+            _ => ThemeVariant.Default
         };
+        // Only an explicit user accent overrides the HEX resources in the theme.
+        Resources.Remove("ThemeAccentColor");
+        Resources.Remove("ThemeAccentBrush");
+        Resources.Remove("Theme.Brush.Accent");
+        if (settings.AccentColor is { } text && Color.TryParse(text, out var accent))
+        {
+            Resources["ThemeAccentColor"] = accent;
+            Resources["ThemeAccentBrush"] = new SolidColorBrush(accent);
+            Resources["Theme.Brush.Accent"] = new SolidColorBrush(accent);
+        }
     }
 }

@@ -12,12 +12,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Avalonia.Markup.Xaml.Loader" PrivateAssets="All" Publish="True" />
     <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="HotAvalonia" PrivateAssets="All" Publish="True" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\BuildingBlocks\MusicPlayer2-Avalonia\MusicPlayer2-Avalonia.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\MusicPlayer2-Avalonia.Infrastructure\MusicPlayer2-Avalonia.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\MusicPlayer2-Avalonia\MusicPlayer2-Avalonia.csproj" />
   </ItemGroup>
 </Project>

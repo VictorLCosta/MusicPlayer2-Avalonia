@@ -10,4 +10,12 @@ const dotnetRuntime = await dotnet
 
 const config = dotnetRuntime.getConfig();
 
-await dotnetRuntime.runMain(config.mainAssemblyName, [globalThis.location.href]);
+try {
+    await dotnetRuntime.runMain(config.mainAssemblyName, [globalThis.location.href]);
+} catch (error) {
+    console.error(error);
+    const message = document.createElement("p");
+    message.textContent = "Não foi possível abrir o armazenamento. Feche outras abas do aplicativo e recarregue. " + error.message;
+    message.setAttribute("role", "alert");
+    document.body.replaceChildren(message);
+}

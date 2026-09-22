@@ -1,14 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+
 using MusicPlayer2_Avalonia.Application.Common;
+using MusicPlayer2_Avalonia.Application.Playlist.Models;
 
 using PlaylistEntity = MusicPlayer2_Avalonia.Domain.Entities.Playlist;
-
-using Microsoft.EntityFrameworkCore;
 
 namespace MusicPlayer2_Avalonia.Application.Playlist;
 
 public sealed class PlaylistService(IMusicPlayerDbContext dbContext)
 {
-    public async Task<PlaylistEntity> CreateAsync(
+    public async Task<PlaylistDto> CreateAsync(
         string name,
         CancellationToken cancellationToken = default)
     {
@@ -17,24 +18,40 @@ public sealed class PlaylistService(IMusicPlayerDbContext dbContext)
         dbContext.Add(playlist);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return playlist;
+        return new PlaylistDto(playlist.Id, playlist.Name);
     }
 
-    public async Task<IReadOnlyList<PlaylistEntity>> ListAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<PlaylistDto>> ListAsync(CancellationToken cancellationToken = default)
     {
         return await dbContext
             .Playlists
             .AsNoTracking()
+            .Select(playlist => new PlaylistDto(playlist.Id, playlist.Name))
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<PlaylistEntity?> GetByIdAsync(Guid playlistId, CancellationToken cancellationToken = default)
+    public async Task<PlaylistDetailsDto?> GetByIdAsync(Guid playlistId, CancellationToken cancellationToken = default)
     {
         return await dbContext
             .Playlists
-            .Include(playlist => playlist.PlaylistItems)
             .AsNoTracking()
-            .FirstOrDefaultAsync(playlist => playlist.Id == playlistId, cancellationToken)
+            .Where(playlist => playlist.Id == playlistId)
+            .Select(playlist => new PlaylistDetailsDto(
+                playlist.Id,
+                playlist.Name,
+                (from item in playlist.PlaylistItems
+                 join track in dbContext.Tracks on item.TrackId equals track.Id
+                 orderby item.Position
+                 select new ListTrackDto(
+                     item.Id,
+                     track.Id,
+                     item.Position,
+                     track.Title,
+                     track.Artist == null ? null : track.Artist.Name,
+                     track.Album == null ? null : track.Album.Title,
+                     track.Duration,
+                     track.SourceFileSizeBytes ?? 0)).ToList()))
+            .FirstOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
     }
 

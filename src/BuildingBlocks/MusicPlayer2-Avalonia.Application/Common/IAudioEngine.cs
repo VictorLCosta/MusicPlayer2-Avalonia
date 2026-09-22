@@ -11,6 +11,11 @@ public interface IAudioEngine : IDisposable
 
     Task LoadAsync(Uri source);
     void Play();
+    void PlayFrom(TimeSpan position)
+    {
+        Play();
+        Seek(position);
+    }
     void Pause();
     void StopAudio();
     void Seek(TimeSpan position);

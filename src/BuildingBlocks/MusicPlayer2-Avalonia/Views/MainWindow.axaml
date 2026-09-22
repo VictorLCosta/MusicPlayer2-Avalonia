@@ -1,13 +1,44 @@
-<Window xmlns="https://github.com/avaloniaui"
+<window:CustomWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:MusicPlayer2.Avalonia.ViewModels"
+        xmlns:window="using:MusicPlayer2_Avalonia.Styles.Window"
+        xmlns:vm="using:MusicPlayer2_Avalonia.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:views="using:MusicPlayer2.Avalonia.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="MusicPlayer2.Avalonia.Views.MainWindow"
-        Title="MusicPlayer2 Avalonia">
+        x:Class="MusicPlayer2_Avalonia.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        BackdropImage="{Binding Main.Player.Artwork}"
+        Title="{Binding Main.Player.CurrentTrack.Title, StringFormat='{}{0} - MusicPlayer2 - Avalonia', TargetNullValue='MusicPlayer2 - Avalonia'}"
+        FontFamily="Segoe UI" FontSize="14"
+        MinWidth="320" MinHeight="430" Width="768" Height="584">
 
-        <views:MainView />
-        
-</Window>
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <window:CustomWindow.RightWindowTitleBarContent>
+      <StackPanel Orientation="Horizontal" Spacing="4">
+        <Button Classes="window-control">
+          <LucideIcon Kind="Menu" Size="16" />
+        </Button>
+
+        <Button Classes="window-control" Command="{Binding NavigateToSettingsCommand}">
+          <LucideIcon Kind="Settings" Size="16" />
+        </Button>
+
+        <Button x:Name="ThemeToggleButton" Classes="window-control" Click="ToggleThemeClicked"
+                IsEnabled="{Binding !Settings.IsBusy}" ToolTip.Tip="Trocar tema">
+          <Grid>
+            <LucideIcon x:Name="LightThemeIcon" Kind="Sun" Size="16" />
+            <LucideIcon x:Name="DarkThemeIcon" Kind="Moon" Size="16" IsVisible="False" />
+          </Grid>
+        </Button>
+      </StackPanel>
+    </window:CustomWindow.RightWindowTitleBarContent>
+
+    <Border Padding="4">
+      <TransitioningContentControl Content="{Binding CurrentPage}" />
+    </Border>
+
+</window:CustomWindow>

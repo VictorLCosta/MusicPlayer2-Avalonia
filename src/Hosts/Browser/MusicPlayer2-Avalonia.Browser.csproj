@@ -4,7 +4,10 @@
     <OutputType>Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
+    <!-- Link the SQLite archive supplied by SQLitePCLRaw into the WASM runtime. -->
+    <WasmBuildNative>true</WasmBuildNative>
   </PropertyGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Browser" />

@@ -1,0 +1,207 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Style Selector=":is(Button)">
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+
+  <Style Selector=":is(UserControl).player-page">
+    <Setter Property="Background" Value="{DynamicResource Theme.Brush.Background}" />
+  </Style>
+  <Style Selector=":is(Window) :is(UserControl).player-page">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
+  <Style Selector="TextBox">
+    <Setter Property="Background" Value="{DynamicResource Theme.Brush.Input}" />
+    <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="TextBox /template/ TextBlock#PART_Watermark">
+    <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.TextMuted}" />
+    <Setter Property="Opacity" Value="0.75" />
+  </Style>
+
+  <Style Selector="ComboBox">
+    <Setter Property="Background" Value="{DynamicResource Theme.Brush.Button}" />
+    <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="Button.window-control">
+    <Setter Property="Width" Value="28" />
+    <Setter Property="Height" Value="26" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Icon}" />
+  </Style>
+  <Style Selector="Button.window-control:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Theme.Brush.ButtonHover}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text}" />
+  </Style>
+  <Style Selector="Button.window-control.close:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#E81123" />
+    <Setter Property="BorderBrush" Value="#E81123" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+
+  <Style Selector="Button.chrome-button, Button.transport-button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Icon}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="Padding" Value="8,4" />
+  </Style>
+
+  <Style Selector="Button.transport-button">
+    <Setter Property="Width" Value="40" />
+    <Setter Property="Height" Value="34" />
+  </Style>
+
+  <Style Selector="Button.chrome-button:pointerover /template/ ContentPresenter, Button.transport-button:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Theme.Brush.ButtonHover}" />
+  </Style>
+
+  <Style Selector="ListBox">
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+
+  <Style Selector="ListBox.playlist /template/ ScrollViewer /template/ ScrollBar#PART_VerticalScrollBar">
+    <Setter Property="Width" Value="10" />
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
+  <Style Selector="ListBox.playlist /template/ ScrollViewer /template/ ScrollBar#PART_VerticalScrollBar /template/ Border">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
+  <Style Selector="ListBox.playlist /template/ ScrollViewer /template/ ScrollBar#PART_VerticalScrollBar /template/ RepeatButton#PART_LineUpButton">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="ListBox.playlist /template/ ScrollViewer /template/ ScrollBar#PART_VerticalScrollBar /template/ RepeatButton#PART_LineDownButton">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="ListBox.playlist /template/ ScrollViewer /template/ ScrollBar#PART_VerticalScrollBar /template/ Thumb#thumb">
+    <Setter Property="Width" Value="6" />
+    <Setter Property="CornerRadius" Value="18" />
+    <Setter Property="Background" Value="{DynamicResource Theme.Brush.Scrollbar}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}" CornerRadius="3" />
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="ListBoxItem">
+    <Setter Property="CornerRadius" Value="5" />
+    <Setter Property="Margin" Value="0,2" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text}" />
+  </Style>
+
+  <Style Selector="ListBox.playlist > ListBoxItem">
+    <Setter Property="BorderThickness" Value="2,0,0,0" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="Padding" Value="8,0" />
+    <Setter Property="Margin" Value="0,1" />
+    <Setter Property="MinHeight" Value="38" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+  </Style>
+
+  <Style Selector="ListBox.playlist > ListBoxItem.current-track">
+    <Setter Property="BorderBrush" Value="{DynamicResource Theme.Brush.Accent}" />
+  </Style>
+
+  <Style Selector="ListBoxItem:nth-child(2n+1)">
+    <Setter Property="Background" Value="{DynamicResource Theme.Brush.ListRow}" />
+  </Style>
+  <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Theme.Brush.ListSelected}" />
+    <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text}" />
+  </Style>
+  <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+    <Setter Property="Foreground" Value="{DynamicResource Theme.Brush.Text}" />
+    <Setter Property="Background" Value="{DynamicResource Theme.Brush.ListSelected}" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+
+  <Style Selector="Slider.time-slider">
+    <Setter Property="Height" Value="20" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid>
+          <Border Height="6" Background="{DynamicResource Theme.Brush.ProgressTrack}" BorderThickness="0"
+                  CornerRadius="3" VerticalAlignment="Center" />
+          <Track x:Name="PART_Track" Height="6" Orientation="Horizontal"
+                 VerticalAlignment="Center"
+                 IsDirectionReversed="{TemplateBinding IsDirectionReversed}"
+                 Minimum="{TemplateBinding Minimum}"
+                 Maximum="{TemplateBinding Maximum}"
+                 Value="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                 Cursor="Hand">
+            <Track.DecreaseButton>
+              <RepeatButton Focusable="False">
+                <RepeatButton.Template>
+                  <ControlTemplate>
+                    <Border Background="{DynamicResource Theme.Brush.Accent}" BorderThickness="0"
+                            CornerRadius="3" Margin="0,0,-7,0" />
+                  </ControlTemplate>
+                </RepeatButton.Template>
+              </RepeatButton>
+            </Track.DecreaseButton>
+            <Track.IncreaseButton>
+              <RepeatButton Focusable="False" Background="Transparent" BorderThickness="0">
+                <RepeatButton.Template>
+                  <ControlTemplate>
+                    <Border Background="Transparent" BorderThickness="0" />
+                  </ControlTemplate>
+                </RepeatButton.Template>
+              </RepeatButton>
+            </Track.IncreaseButton>
+            <Track.Thumb>
+              <Thumb x:Name="PART_Thumb" Height="14" Width="14" Opacity="0">
+                <Thumb.Transitions>
+                  <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.16" />
+                  </Transitions>
+                </Thumb.Transitions>
+                <Thumb.Template>
+                  <ControlTemplate>
+                    <Border Background="{DynamicResource Theme.Brush.Accent}" CornerRadius="99" />
+                  </ControlTemplate>
+                </Thumb.Template>
+              </Thumb>
+            </Track.Thumb>
+          </Track>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="Slider.time-slider:pointerover /template/ Thumb#PART_Thumb">
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+
+  <Style Selector="Button.chrome-button:pressed /template/ ContentPresenter, Button.transport-button:pressed /template/ ContentPresenter, Button.window-control:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource Theme.Brush.ButtonPressed}" />
+  </Style>
+  <Style Selector="Button.window-control.close:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="#AD111D" />
+    <Setter Property="BorderBrush" Value="#AD111D" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+</Styles>
+
+
+
+
+

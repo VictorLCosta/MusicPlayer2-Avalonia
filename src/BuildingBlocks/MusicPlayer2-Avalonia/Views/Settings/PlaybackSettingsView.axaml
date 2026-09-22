@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:MusicPlayer2_Avalonia.ViewModels.Settings"
+             xmlns:settings="using:MusicPlayer2_Avalonia.Application.Settings.Models"
+             xmlns:audio="using:MusicPlayer2_Avalonia.Application.Common"
+             x:Class="MusicPlayer2_Avalonia.Views.Settings.PlaybackSettingsView"
+             x:DataType="vm:PlaybackSettingsViewModel">
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="14" Margin="20" MaxWidth="560" HorizontalAlignment="Stretch">
+      <TextBlock Text="Reprodução" FontSize="22" FontWeight="SemiBold" />
+      <TextBlock Text="Dispositivo de saída de áudio" FontWeight="SemiBold" />
+      <ComboBox ItemsSource="{Binding AvailableAudioDevices}"
+                SelectedItem="{Binding SelectedAudioDevice, Mode=TwoWay}"
+                IsEnabled="{Binding CanSelectAudioOutput}" HorizontalAlignment="Stretch"
+                AutomationProperties.Name="Dispositivo de saída de áudio">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="audio:AudioOutputDevice">
+            <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+      <Button Content="Atualizar dispositivos" Command="{Binding RefreshAudioDevicesCommand}"
+              IsEnabled="{Binding CanSelectAudioOutput}" />
+      <TextBlock Text="{Binding AudioDeviceMessage}" TextWrapping="Wrap"
+                 IsVisible="{Binding AudioDeviceMessage, Converter={x:Static ObjectConverters.IsNotNull}}"
+                 Foreground="{DynamicResource Theme.Brush.TextMuted}" />
+      <CheckBox IsChecked="{Binding RememberPlaybackPosition, Mode=TwoWay}">
+        <TextBlock Text="Lembrar a posição da reprodução" TextWrapping="Wrap" />
+      </CheckBox>
+      <CheckBox IsChecked="{Binding ContinuePlaybackOnPlaylistChange, Mode=TwoWay}">
+        <TextBlock Text="Continuar tocando ao trocar de playlist" TextWrapping="Wrap" />
+      </CheckBox>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

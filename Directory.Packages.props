@@ -1,30 +1,32 @@
 <Project>
-    <PropertyGroup>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-        <EnablePackageVersionOverride>true</EnablePackageVersionOverride>
-    </PropertyGroup>
-    <ItemGroup>
-        <PackageVersion Include="Avalonia" Version="12.1.1" />
-        <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.1.1" />
-        <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.1" />
-        <PackageVersion Include="Avalonia.Desktop" Version="12.1.1" />
-        <PackageVersion Include="Avalonia.iOS" Version="12.1.1" />
-        <PackageVersion Include="Avalonia.Browser" Version="12.1.1" />
-        <PackageVersion Include="Avalonia.Android" Version="12.1.1" />
-
-        <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
-        <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.11" />
-        <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.11" />
-
-        <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-
-        <PackageVersion Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.15" />
-
-        <PackageVersion Include="TagLibSharp" Version="2.3.0" />
-        <PackageVersion Include="LibVLCSharp" Version="3.10.1" />
-
-        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.11" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
-        <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11" />
-    </ItemGroup>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <EnablePackageVersionOverride>true</EnablePackageVersionOverride>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Avalonia" Version="12.1.1" />
+    <PackageVersion Include="Avalonia.Controls.ItemsRepeater" Version="12.0.0" />
+    <PackageVersion Include="Avalonia.Themes.Simple" Version="12.1.1" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.1" />
+    <PackageVersion Include="Avalonia.Desktop" Version="12.1.1" />
+    <PackageVersion Include="Avalonia.iOS" Version="12.1.1" />
+    <PackageVersion Include="Avalonia.Browser" Version="12.1.1" />
+    <PackageVersion Include="Avalonia.Android" Version="12.1.1" />
+    <PackageVersion Include="Avalonia.Markup.Xaml.Loader" Version="12.1.1" />
+    <PackageVersion Include="DynamicData" Version="9.4.33" />
+    <PackageVersion Include="HotAvalonia" Version="3.1.5" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.11" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageVersion Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.15" />
+    <PackageVersion Include="TagLibSharp" Version="2.3.0" />
+    <PackageVersion Include="LibVLCSharp" Version="3.10.1" />
+    <PackageVersion Include="Lucide.Avalonia" Version="0.2.22" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11" />
+    <PackageVersion Include="System.Reactive.Linq" Version="6.1.0" />
+    <PackageVersion Include="VideoLAN.LibVLC.Windows" Version="3.0.23.1" />
+  </ItemGroup>
 </Project>

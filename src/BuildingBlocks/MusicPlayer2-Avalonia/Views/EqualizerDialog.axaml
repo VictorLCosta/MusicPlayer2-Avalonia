@@ -1,0 +1,12 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MusicPlayer2_Avalonia.ViewModels"
+        xmlns:views="using:MusicPlayer2_Avalonia.Views"
+        x:Class="MusicPlayer2_Avalonia.Views.EqualizerDialog"
+        x:DataType="vm:EqualizerViewModel"
+        Title="Equalizador" Width="740" Height="490" MinWidth="400" MinHeight="420"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Background="{DynamicResource Theme.Brush.Background}"
+        Foreground="{DynamicResource Theme.Brush.Text}">
+  <views:EqualizerEditor CloseRequested="CloseClicked" CloseWithoutSavingRequested="CloseWithoutSaving" />
+</Window>

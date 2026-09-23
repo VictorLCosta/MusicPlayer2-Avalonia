@@ -12,6 +12,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<LibraryService>();
+        services.AddSingleton<ManagedAudioImporter>();
         services.AddSingleton<LibraryMaintenanceService>();
         services.AddScoped<PlaylistService>();
         services.AddScoped<PlaybackQueue>();
@@ -19,6 +20,7 @@ public static class DependencyInjection
 
         services.AddSingleton<SettingsService>();
         services.AddSingleton<AudioOutputService>();
+        services.AddSingleton<EqualizerService>();
         services.AddSingleton<PlaybackSessionStore>();
 
         return services;

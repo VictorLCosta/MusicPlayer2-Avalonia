@@ -4,7 +4,7 @@ using MusicPlayer2_Avalonia.Application.Common;
 
 namespace MusicPlayer2_Avalonia.Infrastructure.AudioEngine;
 
-public class VlcAudioEngine : IAudioEngine, IAudioOutputControl, IAudioSpectrumSource
+public class VlcAudioEngine : IAudioEngine, IAudioOutputControl, IAudioSpectrumSource, IAudioEqualizer
 {
     private readonly LibVLC _libVlc;
     private readonly MediaPlayer _player;
@@ -20,6 +20,9 @@ public class VlcAudioEngine : IAudioEngine, IAudioOutputControl, IAudioSpectrumS
     public VlcAudioEngine()
     {
         Core.Initialize();
+        using var equalizer = new Equalizer();
+        EqualizerFrequencies = Array.AsReadOnly(Enumerable.Range(0, (int)equalizer.BandCount)
+            .Select(index => equalizer.BandFrequency((uint)index)).ToArray());
 
         _libVlc = new LibVLC();
         _player = new MediaPlayer(_libVlc);
@@ -31,6 +34,28 @@ public class VlcAudioEngine : IAudioEngine, IAudioOutputControl, IAudioSpectrumS
     }
 
     public bool IsPlaying => _player.IsPlaying;
+
+    public IReadOnlyList<float> EqualizerFrequencies { get; }
+
+    public void ApplyEqualizer(bool enabled, float preamp, IReadOnlyList<float> gains)
+    {
+        ArgumentNullException.ThrowIfNull(gains);
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        if (gains.Count != EqualizerFrequencies.Count || !float.IsFinite(preamp) ||
+            gains.Any(gain => !float.IsFinite(gain)))
+            throw new ArgumentException("Invalid equalizer settings.", nameof(gains));
+
+        using var equalizer = new Equalizer();
+        if (!equalizer.SetPreamp(Math.Clamp(preamp, -12, 12)))
+            throw new InvalidOperationException("Could not set equalizer preamp.");
+        for (var index = 0; index < gains.Count; index++)
+            if (!equalizer.SetAmp(Math.Clamp(gains[index], -12, 12), (uint)index))
+                throw new InvalidOperationException("Could not set equalizer band.");
+
+        if (!(enabled ? _player.SetEqualizer(equalizer) : _player.UnsetEqualizer()))
+            throw new InvalidOperationException("Could not apply equalizer.");
+        _spectrum.ApplyEqualizer(enabled, equalizer);
+    }
 
     public TimeSpan Position => TimeSpan.FromMilliseconds(_player.Time);
 

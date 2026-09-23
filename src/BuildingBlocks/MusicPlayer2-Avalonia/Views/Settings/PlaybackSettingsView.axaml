@@ -6,7 +6,7 @@
              x:Class="MusicPlayer2_Avalonia.Views.Settings.PlaybackSettingsView"
              x:DataType="vm:PlaybackSettingsViewModel">
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Spacing="14" Margin="20" MaxWidth="560" HorizontalAlignment="Stretch">
+    <StackPanel Classes="settings-form" Spacing="14" MaxWidth="560" HorizontalAlignment="Stretch">
       <TextBlock Text="Reprodução" FontSize="22" FontWeight="SemiBold" />
       <TextBlock Text="Dispositivo de saída de áudio" FontWeight="SemiBold" />
       <ComboBox ItemsSource="{Binding AvailableAudioDevices}"

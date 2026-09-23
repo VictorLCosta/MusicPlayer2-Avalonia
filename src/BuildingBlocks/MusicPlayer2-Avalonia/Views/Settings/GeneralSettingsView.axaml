@@ -1,12 +1,14 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:MusicPlayer2_Avalonia.ViewModels.Settings"
-             xmlns:settings="using:MusicPlayer2_Avalonia.Application.Settings.Models"
+             xmlns:app="using:MusicPlayer2_Avalonia" xmlns:settings="using:MusicPlayer2_Avalonia.Application.Settings.Models"
              x:Class="MusicPlayer2_Avalonia.Views.Settings.GeneralSettingsView"
              x:DataType="vm:GeneralSettingsViewModel">
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Spacing="14" Margin="20" MaxWidth="560" HorizontalAlignment="Stretch">
+    <StackPanel Classes="settings-form" Spacing="14" MaxWidth="560" HorizontalAlignment="Stretch">
       <TextBlock Text="Geral" FontSize="22" FontWeight="SemiBold" />
+      <TextBlock IsVisible="{x:Static app:App.IsMobile}" Text="A reprodução continua em segundo plano. Use Parar no player para encerrá-la." TextWrapping="Wrap" />
+      <StackPanel Spacing="14" IsVisible="{x:Static app:App.IsDesktop}">
       <TextBlock Text="Ao fechar a janela" FontWeight="SemiBold" />
       <ComboBox HorizontalAlignment="Stretch"
                 SelectedValue="{Binding CloseBehavior, Mode=TwoWay}"
@@ -14,7 +16,7 @@
         <ComboBoxItem Content="Encerrar o aplicativo" Tag="{x:Static settings:WindowCloseBehavior.Exit}" />
         <ComboBoxItem Content="Minimizar para a bandeja" Tag="{x:Static settings:WindowCloseBehavior.MinimizeToTray}" />
       </ComboBox>
+      </StackPanel>
     </StackPanel>
   </ScrollViewer>
 </UserControl>
-

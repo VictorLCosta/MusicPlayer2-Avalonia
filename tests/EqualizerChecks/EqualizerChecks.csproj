@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/BuildingBlocks/MusicPlayer2-Avalonia.Infrastructure/MusicPlayer2-Avalonia.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MusicPlayer2_Avalonia.ViewModels"
+        xmlns:eq="using:MusicPlayer2_Avalonia.Styles.Equalizer"
+        x:Class="MusicPlayer2_Avalonia.Views.EqualizerEditor"
+        x:DataType="vm:EqualizerViewModel">
+  <Grid Margin="24" RowDefinitions="Auto,*,Auto" RowSpacing="18" IsEnabled="{Binding !IsSaving}">
+    <StackPanel Spacing="6">
+      <TextBlock Text="Equalizador" FontSize="24" FontWeight="SemiBold" />
+      <TextBlock Text="Ajuste o som durante a reprodução. As alterações são salvas ao fechar."
+                 TextWrapping="Wrap" />
+      <ToggleSwitch Content="Ativar equalizador" IsChecked="{Binding IsEnabled, Mode=TwoWay}" Margin="0,8,0,0" />
+    </StackPanel>
+    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="20" IsEnabled="{Binding IsEnabled}">
+        <StackPanel Width="82" Spacing="8">
+          <TextBlock Text="{Binding Preamp, StringFormat='{}{0:+0;-0;0} dB'}" HorizontalAlignment="Center" />
+          <Slider Orientation="Vertical" Height="165" Minimum="-12" Maximum="12" TickFrequency="1"
+                  IsSnapToTickEnabled="True" Value="{Binding Preamp, Mode=TwoWay}"
+                  HorizontalAlignment="Center" AutomationProperties.Name="Pré-amplificação" />
+          <TextBlock Text="Pré-amplif." HorizontalAlignment="Center" />
+        </StackPanel>
+        <eq:Equalizer Grid.Column="1" Bands="{Binding Bands}" />
+      </Grid>
+    </ScrollViewer>
+    <StackPanel Grid.Row="2" Spacing="10">
+      <TextBlock Text="Reduza a pré-amplificação se o som distorcer ao aumentar as bandas." TextWrapping="Wrap" FontSize="12" />
+      <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" Foreground="{DynamicResource Theme.Brush.Danger}"
+                 IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+        <Button Content="Zerar ajustes" Command="{Binding ResetCommand}" HorizontalAlignment="Left" />
+        <Button Grid.Column="1" Content="Fechar sem salvar" Click="CloseWithoutSaving"
+                IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        <Button Grid.Column="2" Content="Fechar" Click="CloseClicked" />
+      </Grid>
+    </StackPanel>
+  </Grid>
+</UserControl>
+

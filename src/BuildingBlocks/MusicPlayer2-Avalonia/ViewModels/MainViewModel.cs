@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 
@@ -14,12 +15,14 @@ using MusicPlayer2_Avalonia.Application.Playlist.Models;
 using MusicPlayer2_Avalonia.Application.Settings;
 using MusicPlayer2_Avalonia.Application.Settings.Models;
 using MusicPlayer2_Avalonia.Models;
+using Avalonia.Input;
 
 namespace MusicPlayer2_Avalonia.ViewModels;
 
 internal sealed partial class MainViewModel : ViewModelBase
 {
-    private readonly LibraryService _libraryService;
+    private readonly IServiceScopeFactory _libraryScopes;
+    private readonly ManagedAudioImporter _importer;
     private readonly SettingsService _settings;
     private readonly LibraryMaintenanceService _maintenance;
     private readonly SemaphoreSlim _refreshGate = new(1, 1);
@@ -42,6 +45,8 @@ internal sealed partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     public partial bool HasTracks { get; private set; }
+    [ObservableProperty]
+    public partial bool IsImporting { get; set; }
 
     private bool _loaded;
 
@@ -66,10 +71,11 @@ internal sealed partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     public partial long TotalSizeBytes { get; private set; }
 
-    public MainViewModel(LibraryService libraryService, PlayerViewModel player,
-        SettingsService settings, LibraryMaintenanceService maintenance)
+    public MainViewModel(IServiceScopeFactory libraryScopes, PlayerViewModel player,
+        SettingsService settings, LibraryMaintenanceService maintenance, ManagedAudioImporter importer)
     {
-        _libraryService = libraryService;
+        _importer = importer;
+        _libraryScopes = libraryScopes;
         Player = player;
         _settings = settings;
         _maintenance = maintenance;
@@ -99,6 +105,21 @@ internal sealed partial class MainViewModel : ViewModelBase
             await Player.PlayTrackAsync(track, FilteredTracks);
     }
 
+    [RelayCommand]
+    private async Task SwipeAsync(object? parameter)
+    {
+        if (parameter is SwipeGestureEndedEventArgs e)
+        {
+            if (Math.Abs(e.Velocity.X) > 200)
+            {
+                if (e.Velocity.X < 0) 
+                    await Player.PreviousCommand.ExecuteAsync(null);
+                if (e.Velocity.X > 0)
+                    await Player.NextCommand.ExecuteAsync(null);
+            }
+        }
+    }
+
     public async Task LoadTracksAsync()
     {
         if (_loaded) return;
@@ -116,7 +137,8 @@ internal sealed partial class MainViewModel : ViewModelBase
                     warning = await _maintenance.UpdateAsync(settings);
                 await Player.InitializeAsync();
             }
-            var tracks = await _libraryService.GetTracksAsync();
+            await using var scope = _libraryScopes.CreateAsyncScope();
+            var tracks = await scope.ServiceProvider.GetRequiredService<LibraryService>().GetTracksAsync();
             _source.Edit(list =>
             {
                 list.Clear();
@@ -135,7 +157,8 @@ internal sealed partial class MainViewModel : ViewModelBase
     {
         try
         {
-            await _libraryService.ScanDirectoryAsync(path);
+            await using var scope = _libraryScopes.CreateAsyncScope();
+            await scope.ServiceProvider.GetRequiredService<LibraryService>().ScanDirectoryAsync(path);
             _loaded = false;
             await LoadTracksAsync();
         }
@@ -144,6 +167,17 @@ internal sealed partial class MainViewModel : ViewModelBase
             LibraryError = ex.Message;
         }
     }
+
+    public async Task ImportFileAsync(string name, Stream source)
+    {
+        var path = await _importer.ImportAsync(name, source);
+        await using var scope = _libraryScopes.CreateAsyncScope();
+        await scope.ServiceProvider.GetRequiredService<LibraryService>().ScanLibrary(path);
+        _loaded = false;
+        await LoadTracksAsync();
+    }
+
+    public void ReportImportError(string message) => LibraryError = message;
 
     private void UpdateLibraryFolders(AppSettings settings)
     {
@@ -173,7 +207,8 @@ internal sealed partial class MainViewModel : ViewModelBase
             UpdateLibraryFolders(settings);
             if (!needsUpdate) return;
             var warning = await _maintenance.UpdateAsync(settings);
-            var tracks = await _libraryService.GetTracksAsync();
+            await using var scope = _libraryScopes.CreateAsyncScope();
+            var tracks = await scope.ServiceProvider.GetRequiredService<LibraryService>().GetTracksAsync();
             _source.Edit(list => { list.Clear(); list.AddRange(tracks); });
             LibraryError = warning;
         }

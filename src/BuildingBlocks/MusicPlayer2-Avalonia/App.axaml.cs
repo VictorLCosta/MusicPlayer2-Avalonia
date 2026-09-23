@@ -25,6 +25,21 @@ public partial class App : AvaloniaApplication
     private readonly Action<IServiceCollection>? _configureServices;
     private readonly IServiceProvider? _providedServices;
     private SettingsService? _settings;
+    private MobileShell? _mobileShell;
+
+    public IServiceProvider Services => _serviceProvider;
+    public static bool IsMobile => OperatingSystem.IsAndroid() || OperatingSystem.IsIOS();
+    public static bool IsDesktop => !IsMobile && !OperatingSystem.IsBrowser();
+
+    protected virtual void ConfigurePlatformServices(IServiceCollection services) { }
+
+    public bool NavigateBack() => _mobileShell?.NavigateBack() == true;
+
+    public async Task SavePlaybackAsync()
+    {
+        try { await _serviceProvider.GetRequiredService<PlayerService>().SaveSessionAsync(); }
+        catch (Exception) { /* A lifecycle callback must not crash the host on storage failure. */ }
+    }
 
     public App()
     {
@@ -58,6 +73,7 @@ public partial class App : AvaloniaApplication
             collection.AddUIServices();
             collection.AddApplicationServices();
             collection.AddInfrastructureServices();
+            ConfigurePlatformServices(collection);
 
             _configureServices?.Invoke(collection);
 
@@ -88,18 +104,20 @@ public partial class App : AvaloniaApplication
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
-            singleViewPlatform.MainView = new MainView
-            {
-                DataContext = _serviceProvider.GetRequiredService<MainViewModel>(),
-            };
+            singleViewPlatform.MainView = CreateMobileShell();
         }
         else if (ApplicationLifetime is IActivityApplicationLifetime activity)
         {
-            activity.MainViewFactory = () => new MainView { DataContext = _serviceProvider.GetRequiredService<MainViewModel>() };
+            activity.MainViewFactory = CreateMobileShell;
         }
 
         base.OnFrameworkInitializationCompleted();
     }
+
+    private MobileShell CreateMobileShell() => _mobileShell = new MobileShell
+    {
+        DataContext = _serviceProvider.GetRequiredService<MainWindowViewModel>()
+    };
 
     private async Task InitializeAppearanceAsync()
     {

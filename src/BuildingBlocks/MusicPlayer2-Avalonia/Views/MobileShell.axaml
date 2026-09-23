@@ -1,0 +1,11 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:MusicPlayer2_Avalonia.ViewModels" x:Class="MusicPlayer2_Avalonia.Views.MobileShell"
+             x:DataType="vm:MainWindowViewModel" TopLevel.AutoSafeAreaPadding="True"
+             Background="{DynamicResource Theme.Brush.Background}">
+  <Grid>
+    <TransitioningContentControl x:Name="PageContent" Content="{Binding CurrentPage}" />
+    <Border x:Name="DialogOverlay" IsVisible="False" Background="{DynamicResource Theme.Brush.Background}">
+      <ContentControl x:Name="DialogContent" />
+    </Border>
+  </Grid>
+</UserControl>

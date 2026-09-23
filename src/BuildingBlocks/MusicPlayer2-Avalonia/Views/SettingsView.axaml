@@ -8,13 +8,25 @@
              x:Class="MusicPlayer2_Avalonia.Views.SettingsView"
              x:DataType="vm:SettingsViewModel">
 
+  <Grid Container.Name="settings" Container.Sizing="Width">
   <Grid RowDefinitions="* Auto">
-    <Grid ColumnDefinitions="Auto *" Background="Transparent"
+    <DockPanel Background="Transparent"
           IsEnabled="{Binding CanEdit}">
-      <Border Grid.Column="0" Padding="8" BorderThickness="0,0,1,0"
+      <Border Classes="settings-navigation"
               BorderBrush="{DynamicResource Theme.Brush.Divider}">
-        <ListBox ItemsSource="{Binding SettingsMenuItems}"
-                SelectedItem="{Binding SelectedMenuItem}"
+        <Grid>
+        <ComboBox Classes="settings-mobile-menu" HorizontalAlignment="Stretch"
+                  ItemsSource="{Binding SettingsMenuItems}"
+                  SelectedItem="{Binding SelectedMenuItem, Mode=TwoWay}"
+                  AutomationProperties.Name="Seção de configurações">
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="models:MenuItem">
+              <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <ListBox Classes="settings-desktop-menu" ItemsSource="{Binding SettingsMenuItems}"
+                SelectedItem="{Binding SelectedMenuItem, Mode=TwoWay}"
                 Background="Transparent">
           <ListBox.ItemTemplate>
             <DataTemplate x:DataType="models:MenuItem">
@@ -25,26 +37,25 @@
             </DataTemplate>
           </ListBox.ItemTemplate>
         </ListBox>
+        </Grid>
       </Border>
 
-      <TransitioningContentControl Grid.Column="1" 
-                                  Padding="8,0" 
-                                  Content="{Binding CurrentPage}" />
-    </Grid>
+      <TransitioningContentControl Classes="settings-page" Content="{Binding CurrentPage}" />
+    </DockPanel>
 
     <Border Grid.Row="1"
             BorderBrush="{DynamicResource Theme.Brush.Divider}" 
             BorderThickness="0,1,0,0">
       <StackPanel Spacing="8" 
                   Margin="12">
-        <TextBlock Text="Carregando ou salvando configurações…" IsVisible="{Binding IsBusy}" />
+        <TextBlock Text="Carregando ou salvando configurações…" TextWrapping="Wrap" IsVisible="{Binding IsBusy}" />
         <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"
                    IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}"
                    Foreground="{DynamicResource Theme.Brush.Danger}" />
         <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap"
                  IsVisible="{Binding StatusMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
                  
-        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <WrapPanel Classes="settings-actions">
           <Button Content="Voltar ao player" Click="BackToPlayerClicked" />
           <Button Content="Carregar configurações" Command="{Binding LoadSettingsCommand}"
                   IsVisible="{Binding !IsLoaded}" />
@@ -60,9 +71,10 @@
               <TextBlock Text="Aplicar" VerticalAlignment="Center" />
             </StackPanel>
           </Button>
-        </StackPanel>
+        </WrapPanel>
       </StackPanel>
     </Border>
   </Grid>
 
+  </Grid>
 </UserControl>

@@ -15,20 +15,8 @@ public partial class NowPlaying : UserControl
     public static readonly StyledProperty<IAudioSpectrumSource?> SpectrumSourceProperty =
         AvaloniaProperty.Register<NowPlaying, IAudioSpectrumSource?>(nameof(SpectrumSource));
 
-    public IAudioSpectrumSource? SpectrumSource
-    {
-        get => GetValue(SpectrumSourceProperty);
-        set => SetValue(SpectrumSourceProperty, value);
-    }
-
     public static readonly StyledProperty<bool> ShowAlbumCoverProperty =
         AvaloniaProperty.Register<NowPlaying, bool>(nameof(ShowAlbumCover), true);
-
-    public bool ShowAlbumCover
-    {
-        get => GetValue(ShowAlbumCoverProperty);
-        set => SetValue(ShowAlbumCoverProperty, value);
-    }
 
     public static readonly StyledProperty<ListTrackDto?> CurrentTrackProperty =
         AvaloniaProperty.Register<NowPlaying, ListTrackDto?>(nameof(CurrentTrack));
@@ -69,6 +57,22 @@ public partial class NowPlaying : UserControl
         AvaloniaProperty.Register<NowPlaying, ICommand?>(
             nameof(NextCommand));
 
+    public static readonly StyledProperty<ICommand?> SwipeCommandProperty =
+        AvaloniaProperty.Register<NowPlaying, ICommand?>(
+            nameof(SwipeCommand));
+
+    public IAudioSpectrumSource? SpectrumSource
+    {
+        get => GetValue(SpectrumSourceProperty);
+        set => SetValue(SpectrumSourceProperty, value);
+    }
+
+    public bool ShowAlbumCover
+    {
+        get => GetValue(ShowAlbumCoverProperty);
+        set => SetValue(ShowAlbumCoverProperty, value);
+    }
+
     public ListTrackDto? CurrentTrack
     {
         get => GetValue(CurrentTrackProperty);
@@ -103,6 +107,12 @@ public partial class NowPlaying : UserControl
     {
         get => GetValue(NextCommandProperty);
         set => SetValue(NextCommandProperty, value);
+    }
+
+    public ICommand? SwipeCommand
+    {
+        get => GetValue(SwipeCommandProperty);
+        set => SetValue(SwipeCommandProperty, value);
     }
 
     public IImage? Artwork

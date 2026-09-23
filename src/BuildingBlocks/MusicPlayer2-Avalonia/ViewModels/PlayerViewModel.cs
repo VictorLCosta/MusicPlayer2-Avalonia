@@ -16,6 +16,7 @@ namespace MusicPlayer2_Avalonia.ViewModels;
 
 internal sealed partial class PlayerViewModel : ViewModelBase
 {
+    public EqualizerService Equalizer { get; }
     private readonly PlayerService _service;
     public IAudioSpectrumSource? SpectrumSource => _service.SpectrumSource;
     private readonly PlaybackQueue _queue;
@@ -29,8 +30,9 @@ internal sealed partial class PlayerViewModel : ViewModelBase
     private int _artworkRequest;
 
     public PlayerViewModel(PlayerService service, PlaybackQueue queue, SettingsService settings,
-        IEnumerable<IAlbumArtworkReader> artworkReaders)
+        IEnumerable<IAlbumArtworkReader> artworkReaders, EqualizerService equalizer)
     {
+        Equalizer = equalizer;
         _service = service;
         _queue = queue;
         _settings = settings;

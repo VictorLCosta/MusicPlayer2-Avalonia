@@ -18,6 +18,15 @@
             "stopAtEntry": false
         },
         {
+            // Requires ms-vscode.mono-debug and an authorized Android device/emulator.
+            "name": "Debug - Android",
+            "type": "mono",
+            "request": "attach",
+            "preLaunchTask": "run-debug-android",
+            "address": "localhost",
+            "port": 10000
+        },
+        {
             "name": ".NET Core Attach",
             "type": "coreclr",
             "request": "attach"

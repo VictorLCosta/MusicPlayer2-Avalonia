@@ -16,17 +16,16 @@ namespace MusicPlayer2_Avalonia.Views;
 public partial class MainView : UserControl
 {
     private PlayerViewModel? _activePlayer;
-    private bool _showPlaylist = true;
-    private bool? _wasNarrow;
+    private bool _equalizerOpen;
 
     public MainView()
     {
         InitializeComponent();
         TimeSlider.AddHandler(InputElement.PointerPressedEvent, SeekToPointer,
             RoutingStrategies.Tunnel, handledEventsToo: true);
+        MobileTimeSlider.AddHandler(InputElement.PointerPressedEvent, SeekToPointer,
+            RoutingStrategies.Tunnel, handledEventsToo: true);
         DataContextChanged += (_, _) => UpdatePlayer();
-        SizeChanged += (_, _) => UpdateResponsiveLayout();
-        UpdateResponsiveLayout();
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -58,6 +57,8 @@ public partial class MainView : UserControl
         _activePlayer = TopLevel.GetTopLevel(this) is not null && DataContext is MainViewModel vm ? vm.Player : null;
         if (_activePlayer is not null) _activePlayer.PropertyChanged += PlaybackChanged;
         _activePlayer?.StartUpdating();
+        EqualizerButton.IsEnabled = MobileEqualizerButton.IsEnabled =
+            _activePlayer?.Equalizer.IsSupported == true;
         UpdateTrackIndicators();
     }
 
@@ -88,47 +89,43 @@ public partial class MainView : UserControl
 
     private void OpenSettings(object? sender, RoutedEventArgs e)
     {
-        if (TopLevel.GetTopLevel(this)?.DataContext is MainWindowViewModel vm)
+        if (MobileShell.NavigationFor(this) is { } vm)
             vm.NavigateToSettings();
+    }
+
+    private async void OpenEqualizer(object? sender, RoutedEventArgs e)
+    {
+        if (_equalizerOpen || DataContext is not MainViewModel vm ||
+            !vm.Player.Equalizer.IsSupported) return;
+        _equalizerOpen = true;
+        using var equalizer = new EqualizerViewModel(vm.Player.Equalizer);
+        try
+        {
+            await equalizer.InitializeAsync();
+            if (TopLevel.GetTopLevel(this) is Window owner)
+                await new EqualizerDialog { DataContext = equalizer }.ShowDialog(owner);
+            else if (this.GetVisualAncestors().OfType<MobileShell>().FirstOrDefault() is { } shell)
+                await shell.ShowEqualizerAsync(equalizer);
+        }
+        finally { _equalizerOpen = false; }
     }
 
     private void FocusSearch(object? sender, RoutedEventArgs e)
     {
-        _showPlaylist = true;
-        UpdateResponsiveLayout();
+        SetPlaylistOpen(true);
+
         PlaylistPanel.GetVisualDescendants().OfType<TextBox>().FirstOrDefault()?.Focus();
     }
 
     private void TogglePlaylist(object? sender, RoutedEventArgs e)
     {
-        _showPlaylist = !_showPlaylist;
-        UpdateResponsiveLayout();
+        SetPlaylistOpen(!PlaylistPanel.IsVisible);
     }
 
-    private void UpdateResponsiveLayout()
+    private void SetPlaylistOpen(bool open)
     {
-        var narrow = Bounds.Width > 0 && Bounds.Width < 660;
-        if (_wasNarrow != narrow)
-        {
-            _showPlaylist = !narrow;
-            _wasNarrow = narrow;
-        }
-        if (narrow)
-        {
-            ContentGrid.ColumnDefinitions = new ColumnDefinitions("*,0");
-            Grid.SetColumn(PlaylistPanel, 0);
-            PlayerPanel.IsVisible = !_showPlaylist;
-            PlaylistPanel.IsVisible = _showPlaylist;
-        }
-        else
-        {
-            Grid.SetColumn(PlaylistPanel, 1);
-            ContentGrid.ColumnDefinitions = _showPlaylist
-                ? new ColumnDefinitions("*,*")
-                : new ColumnDefinitions("*,0");
-            PlayerPanel.IsVisible = true;
-            PlaylistPanel.IsVisible = _showPlaylist;
-        }
+        PlayerLayout.Classes.Set("playlist-open", open);
+        PlayerLayout.Classes.Set("playlist-closed", !open);
     }
 
     private void PlayTrackDoubleTapped(object? sender, TappedEventArgs e)
@@ -139,32 +136,70 @@ public partial class MainView : UserControl
 
     private void SeekToPointer(object? sender, PointerPressedEventArgs e)
     {
-        var thumb = TimeSlider.GetVisualDescendants().OfType<Thumb>().FirstOrDefault();
-        if (!e.GetCurrentPoint(TimeSlider).Properties.IsLeftButtonPressed ||
+        if (sender is not Slider slider) return;
+        var thumb = slider.GetVisualDescendants().OfType<Thumb>().FirstOrDefault();
+        if (!e.GetCurrentPoint(slider).Properties.IsLeftButtonPressed ||
             thumb?.IsPointerOver == true ||
             DataContext is not MainViewModel { Player.CurrentTrack: not null } ||
-            TimeSlider.Maximum <= TimeSlider.Minimum)
+            slider.Maximum <= slider.Minimum)
             return;
 
         var thumbWidth = thumb?.Bounds.Width ?? 0;
-        var travelWidth = TimeSlider.Bounds.Width - thumbWidth;
+        var travelWidth = slider.Bounds.Width - thumbWidth;
         if (travelWidth <= 0) return;
 
         var fraction = Math.Clamp(
-            (e.GetPosition(TimeSlider).X - thumbWidth / 2) / travelWidth, 0, 1);
-        TimeSlider.SetCurrentValue(RangeBase.ValueProperty,
-            TimeSlider.Minimum + fraction * (TimeSlider.Maximum - TimeSlider.Minimum));
+            (e.GetPosition(slider).X - thumbWidth / 2) / travelWidth, 0, 1);
+        slider.SetCurrentValue(RangeBase.ValueProperty,
+            slider.Minimum + fraction * (slider.Maximum - slider.Minimum));
         e.Handled = true;
     }
 
     private async void ImportFolderClicked(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is not MainViewModel vm || TopLevel.GetTopLevel(this) is not { } topLevel)
+        if (DataContext is not MainViewModel vm || vm.IsImporting || TopLevel.GetTopLevel(this) is not { } topLevel)
             return;
 
-        var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(
-            new FolderPickerOpenOptions { Title = "Selecionar pasta de músicas", AllowMultiple = false });
-        if (folders.Count > 0 && folders[0].Path.IsFile)
-            await vm.ImportFolderAsync(folders[0].Path.LocalPath);
+        vm.IsImporting = true;
+        try
+        {
+            if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS() || !topLevel.StorageProvider.CanPickFolder)
+            {
+                var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+                {
+                    Title = "Importar músicas para o aplicativo", AllowMultiple = true,
+                    FileTypeFilter = [new FilePickerFileType("Áudio")
+                    {
+                        MimeTypes = ["audio/*"], AppleUniformTypeIdentifiers = ["public.audio"],
+                        Patterns = ["*.mp3", "*.m4a", "*.aac", "*.flac", "*.wav", "*.ogg", "*.opus", "*.aiff"]
+                    }]
+                });
+                var errors = new List<string>();
+                foreach (var file in files)
+                {
+                    using (file)
+                    {
+                        try
+                        {
+                            await using var stream = await file.OpenReadAsync();
+                            await vm.ImportFileAsync(file.Name, stream);
+                        }
+                        catch (Exception ex) { errors.Add(file.Name + ": " + ex.Message); }
+                    }
+                }
+                if (errors.Count > 0) vm.ReportImportError(string.Join(Environment.NewLine, errors));
+            }
+            else
+            {
+                var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(
+                    new FolderPickerOpenOptions { Title = "Selecionar pasta de músicas", AllowMultiple = false });
+                foreach (var folder in folders)
+                    using (folder)
+                        if (folder.TryGetLocalPath() is { } path) await vm.ImportFolderAsync(path);
+                        else vm.ReportImportError("Selecione uma pasta local.");
+            }
+        }
+        catch (Exception ex) { vm.ReportImportError("Falha ao importar músicas: " + ex.Message); }
+        finally { vm.IsImporting = false; }
     }
 }

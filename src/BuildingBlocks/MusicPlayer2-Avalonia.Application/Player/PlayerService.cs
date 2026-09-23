@@ -9,11 +9,13 @@ namespace MusicPlayer2_Avalonia.Application.Player;
 public sealed class PlayerService : IDisposable
 {
     private readonly IAudioEngine _audioEngine;
+    private readonly SemaphoreSlim _playbackCommands = new(1, 1);
     private readonly IMusicPlayerDbContext _dbContext;
     private readonly PlaybackQueue _playbackQueue;
     private readonly AudioOutputService _audioOutput;
     private readonly SettingsService _settings;
     private readonly PlaybackSessionStore _sessionStore;
+    private readonly EqualizerService _equalizer;
     private TimeSpan? _resumePosition;
     private bool _sessionRestored;
     private bool _sessionReady;
@@ -25,7 +27,8 @@ public sealed class PlayerService : IDisposable
         PlaybackQueue playbackQueue,
         AudioOutputService audioOutput,
         SettingsService settings,
-        PlaybackSessionStore sessionStore)
+        PlaybackSessionStore sessionStore,
+        EqualizerService equalizer)
     {
         _audioEngine = audioEngine;
         _dbContext = dbContext;
@@ -33,6 +36,7 @@ public sealed class PlayerService : IDisposable
         _audioOutput = audioOutput;
         _settings = settings;
         _sessionStore = sessionStore;
+        _equalizer = equalizer;
         _audioEngine.PlaybackEnded += OnPlaybackEnded;
     }
 
@@ -52,13 +56,13 @@ public sealed class PlayerService : IDisposable
         set => _audioEngine.Volume = value;
     }
 
-    public async Task PlayAsync(
+    public Task PlayAsync(
         Guid trackId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default) => SerializePlaybackAsync(async () =>
     {
         await LoadAndPlayAsync(trackId, cancellationToken).ConfigureAwait(false);
         _playbackQueue.SetCurrent(trackId);
-    }
+    }, cancellationToken);
 
     public void Pause() => _audioEngine.Pause();
 
@@ -85,7 +89,10 @@ public sealed class PlayerService : IDisposable
         CurrentTrack = null;
     }
 
-    public async Task LoadPlaylistAsync(
+    public Task LoadPlaylistAsync(Guid playlistId, CancellationToken cancellationToken = default) =>
+        SerializePlaybackAsync(() => LoadPlaylistCoreAsync(playlistId, cancellationToken), cancellationToken);
+
+    private async Task LoadPlaylistCoreAsync(
         Guid playlistId,
         CancellationToken cancellationToken = default)
     {
@@ -106,7 +113,7 @@ public sealed class PlayerService : IDisposable
             _playbackQueue.SetCurrent(current.Id);
     }
 
-    public async Task NextAsync(CancellationToken cancellationToken = default)
+    public Task NextAsync(CancellationToken cancellationToken = default) => SerializePlaybackAsync(async () =>
     {
         if (!_playbackQueue.TryMoveNext(out var trackId))
         {
@@ -114,9 +121,9 @@ public sealed class PlayerService : IDisposable
         }
 
         await LoadAndPlayAsync(trackId, cancellationToken).ConfigureAwait(false);
-    }
+    }, cancellationToken);
 
-    public async Task PreviousAsync(CancellationToken cancellationToken = default)
+    public Task PreviousAsync(CancellationToken cancellationToken = default) => SerializePlaybackAsync(async () =>
     {
         if (!_playbackQueue.TryMovePrevious(out var trackId))
         {
@@ -124,7 +131,7 @@ public sealed class PlayerService : IDisposable
         }
 
         await LoadAndPlayAsync(trackId, cancellationToken).ConfigureAwait(false);
-    }
+    }, cancellationToken);
 
     public void Seek(TimeSpan position)
     {
@@ -136,8 +143,11 @@ public sealed class PlayerService : IDisposable
             _audioEngine.Seek(position);
     }
 
-    public async Task RestoreSessionAsync()
+    public Task RestoreSessionAsync() => SerializePlaybackAsync(RestoreSessionOnceAsync);
+
+    private async Task RestoreSessionOnceAsync()
     {
+        await _equalizer.InitializeAsync().ConfigureAwait(false);
         if (_sessionRestored) return;
         _sessionRestored = true;
         try { await RestoreSessionCoreAsync().ConfigureAwait(false); }
@@ -188,6 +198,14 @@ public sealed class PlayerService : IDisposable
 
         _audioEngine.PlaybackEnded -= OnPlaybackEnded;
         _disposed = true;
+        _playbackCommands.Dispose();
+    }
+
+    private async Task SerializePlaybackAsync(Func<Task> command, CancellationToken cancellationToken = default)
+    {
+        await _playbackCommands.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try { await command().ConfigureAwait(false); }
+        finally { _playbackCommands.Release(); }
     }
 
     private async Task LoadAndPlayAsync(Guid trackId, CancellationToken cancellationToken)
@@ -210,6 +228,7 @@ public sealed class PlayerService : IDisposable
         }
 
         await _audioOutput.InitializeAsync().ConfigureAwait(false);
+        await _equalizer.InitializeAsync().ConfigureAwait(false);
         await _audioEngine.LoadAsync(new Uri(track.Source.Path)).ConfigureAwait(false);
         _resumePosition = null;
         _audioEngine.Play();

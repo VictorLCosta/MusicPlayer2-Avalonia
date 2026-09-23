@@ -2,6 +2,7 @@
   <SimpleTheme />
 
   <StyleInclude Source="avares://MusicPlayer2-Avalonia/Styles/Common.axaml" />
+  <StyleInclude Source="avares://MusicPlayer2-Avalonia/Styles/Breakpoints.axaml" />
   
   <Styles.Resources>
     <ResourceDictionary>

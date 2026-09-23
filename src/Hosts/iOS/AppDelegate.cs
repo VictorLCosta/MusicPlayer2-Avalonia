@@ -13,7 +13,7 @@ namespace MusicPlayer2.Avalonia.iOS;
 // User Interface of the application, as well as listening (and optionally responding) to 
 // application events from iOS.
 [Register("AppDelegate")]
-internal sealed partial class AppDelegate : AvaloniaAppDelegate<App>
+internal sealed partial class AppDelegate : AvaloniaAppDelegate<IosPlayerApp>
 #pragma warning restore CA1711 // Identifiers should not have incorrect suffix
 {
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)

@@ -5,7 +5,7 @@
              x:Class="MusicPlayer2_Avalonia.Views.Settings.AppearanceSettingsView"
              x:DataType="vm:AppearanceSettingsViewModel">
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Spacing="14" Margin="20" MaxWidth="560" HorizontalAlignment="Stretch">
+    <StackPanel Classes="settings-form" Spacing="14" MaxWidth="560" HorizontalAlignment="Stretch">
       <TextBlock Text="Aparência" FontSize="22" FontWeight="SemiBold" />
       <TextBlock Text="Tema" FontWeight="SemiBold" />
       <ComboBox HorizontalAlignment="Stretch"
@@ -20,7 +20,9 @@
                AutomationProperties.Name="Cor de destaque" />
       <TextBlock Text="Deixe em branco para usar a cor do tema." TextWrapping="Wrap"
                  Foreground="{DynamicResource Theme.Brush.TextMuted}" />
-      <CheckBox IsChecked="{Binding ShowAlbumCover, Mode=TwoWay}" Content="Mostrar capa do álbum" />
+      <CheckBox IsChecked="{Binding ShowAlbumCover, Mode=TwoWay}" >
+        <TextBlock Text="Mostrar capa do álbum" TextWrapping="Wrap" />
+      </CheckBox>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

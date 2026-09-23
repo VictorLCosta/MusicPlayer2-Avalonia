@@ -28,6 +28,12 @@ internal sealed class VlcSpectrumReader : IDisposable
     }
 
     public void Play(Media media) => _player.Play(media);
+    public void ApplyEqualizer(bool enabled, Equalizer equalizer)
+    {
+        if (!(enabled ? _player.SetEqualizer(equalizer) : _player.UnsetEqualizer()))
+            throw new InvalidOperationException("Could not apply spectrum equalizer.");
+        Clear();
+    }
     public void Pause() => _player.SetPause(true);
     public void Resume() => _player.SetPause(false);
     public void Seek(long milliseconds) { _player.Time = milliseconds; Clear(); }

@@ -28,7 +28,7 @@ public partial class SettingsView : UserControl
 
     private void BackToPlayerClicked(object? sender, RoutedEventArgs e)
     {
-        if (TopLevel.GetTopLevel(this)?.DataContext is MainWindowViewModel vm)
+        if (MobileShell.NavigationFor(this) is { } vm)
             vm.NavigateToMain();
     }
 }

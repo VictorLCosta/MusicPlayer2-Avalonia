@@ -13,7 +13,7 @@ namespace MusicPlayer2.Avalonia.Android;
 
 [Application]
 public sealed class AndroidApp(IntPtr javaReference, JniHandleOwnership transfer)
-    : AvaloniaAndroidApplication<App>(javaReference, transfer)
+    : AvaloniaAndroidApplication<AndroidPlayerApp>(javaReference, transfer)
 {
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
     {

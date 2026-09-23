@@ -2,40 +2,43 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:MusicPlayer2_Avalonia.ViewModels"
              xmlns:lucide="using:Lucide.Avalonia"
+             xmlns:spectrum="using:MusicPlayer2_Avalonia.Styles.AudioSpectrum"
              xmlns:nowPlaying="using:MusicPlayer2_Avalonia.Styles.NowPlaying"
              x:Class="MusicPlayer2_Avalonia.Views.MainView"
              Classes="player-page"
              FontFamily="Segoe UI" FontSize="14"
              x:DataType="vm:MainViewModel">
              
-  <Grid RowDefinitions="Auto,*,Auto,Auto" Background="Transparent">
-    <Border Grid.Row="0" Padding="2,4,4,10">
-      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-        <StackPanel Spacing="2">
-          <TextBlock Text="{Binding Player.CurrentTrack.Title, TargetNullValue='MusicPlayer2'}"
-                     TextTrimming="CharacterEllipsis" FontSize="14" />
-          <TextBlock Text="{Binding Player.AudioSummary}" TextTrimming="CharacterEllipsis" />
-        </StackPanel>
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-          <Button Classes="chrome-button" Click="ImportFolderClicked"
-                  ToolTip.Tip="Adicionar pasta de músicas"><lucide:LucideIcon Kind="FolderPlus" Size="18" /></Button>
-          <Button x:Name="PlaylistToggleButton" Classes="chrome-button"
-                  Click="TogglePlaylist" ToolTip.Tip="Mostrar ou ocultar lista"><lucide:LucideIcon Kind="ListMusic" Size="18" /></Button>
-        </StackPanel>
-      </Grid>
-    </Border>
+  <Grid Container.Name="player" Container.Sizing="Width">
+    <Grid x:Name="PlayerLayout" RowDefinitions="Auto,*,Auto,Auto" Background="Transparent">
+      <Border Grid.Row="0" Classes="player-desktop" Padding="2,4,4,10">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+          <StackPanel Spacing="2">
+            <TextBlock Text="{Binding Player.CurrentTrack.Title, TargetNullValue='MusicPlayer2'}"
+                       TextTrimming="CharacterEllipsis" FontSize="14" />
+            <TextBlock Text="{Binding Player.AudioSummary}" TextTrimming="CharacterEllipsis" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+            <Button Classes="chrome-button" Click="ImportFolderClicked"
+                    ToolTip.Tip="Adicionar pasta de músicas"><lucide:LucideIcon Kind="FolderPlus" Size="18" /></Button>
+            <Button x:Name="PlaylistToggleButton" Classes="chrome-button"
+                    Click="TogglePlaylist" ToolTip.Tip="Mostrar ou ocultar lista"><lucide:LucideIcon Kind="ListMusic" Size="18" /></Button>
+          </StackPanel>
+        </Grid>
+      </Border>
 
-    <Grid Grid.Row="1" x:Name="ContentGrid" ColumnDefinitions="*,*" MinHeight="0">
-      <nowPlaying:NowPlaying Grid.Column="0" x:Name="PlayerPanel"
-                             CurrentTrack="{Binding Player.CurrentTrack}"
-                             Artwork="{Binding Player.Artwork}"
-                             SpectrumSource="{Binding Player.SpectrumSource}"
-                             ShowAlbumCover="{Binding Player.ShowAlbumCover}"
-                             ErrorMessage="{Binding Player.ErrorMessage}" />
-
-      <Border Grid.Column="1" x:Name="PlaylistPanel" Padding="4,0,8,8">
-        <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="5">
-          <Grid ColumnDefinitions="Auto,*,Auto" Height="32" ColumnSpacing="8">
+      <Grid Grid.Row="1" x:Name="ContentGrid" ColumnDefinitions="*,*" MinHeight="0">
+        <nowPlaying:NowPlaying Grid.Column="0" x:Name="PlayerPanel"
+                               CurrentTrack="{Binding Player.CurrentTrack}"
+                               Artwork="{Binding Player.Artwork}"
+                               SpectrumSource="{Binding Player.SpectrumSource}"
+                               ShowAlbumCover="{Binding Player.ShowAlbumCover}"
+                               ErrorMessage="{Binding Player.ErrorMessage}"
+                               SwipeCommand="{Binding SwipeCommand}" />
+          
+        <Border x:Name="PlaylistPanel" Padding="4,0,8,8">
+          <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="5">
+            <Grid ColumnDefinitions="Auto,*,Auto" Height="32" ColumnSpacing="8">
             <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
               <lucide:LucideIcon Kind="ListMusic" Size="18" />
               <TextBlock Text="Playlist" VerticalAlignment="Center" />
@@ -48,13 +51,13 @@
             </Button>
           </Grid>
 
-          <TextBox Grid.Row="1" Height="30" MinHeight="30" Padding="6,3" Text="{Binding SearchText, Mode=TwoWay}" PlaceholderText="Pesquisar músicas">
-            <TextBox.InnerRightContent>
-              <LucideIcon Kind="Search" Size="14" Margin="2" />
-            </TextBox.InnerRightContent>
-          </TextBox>
+            <TextBox Grid.Row="1" Height="30" MinHeight="30" Padding="6,3" Text="{Binding SearchText, Mode=TwoWay}" PlaceholderText="Pesquisar músicas">
+              <TextBox.InnerRightContent>
+                <LucideIcon Kind="Search" Size="14" Margin="2" />
+              </TextBox.InnerRightContent>
+            </TextBox>
 
-          <Grid Grid.Row="2">
+            <Grid Grid.Row="2">
 
             <StackPanel IsVisible="{Binding !HasTracks}" VerticalAlignment="Center"
                         HorizontalAlignment="Center" Spacing="8">
@@ -85,7 +88,7 @@
               </ListBox.ItemTemplate>
             </ListBox>
           </Grid>
-          <Grid Grid.Row="3" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+          <Grid Grid.Row="3" Classes="player-desktop" ColumnDefinitions="*,Auto" ColumnSpacing="8">
             <TextBlock Text="{Binding LibraryError}" Foreground="{DynamicResource Theme.Brush.Danger}"
                        TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
           </Grid>
@@ -93,12 +96,16 @@
       </Border>
     </Grid>
 
-    <Border Grid.Row="2" Background="{DynamicResource Theme.Brush.Toolbar}" Margin="2,0,2,0"
+      <Border Grid.Row="2" Classes="player-desktop" Background="{DynamicResource Theme.Brush.Toolbar}" Margin="2,0,2,0"
             CornerRadius="5" Padding="3,0" Height="30">
       <Grid ColumnDefinitions="* Auto">
         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="0">
           <Button Classes="chrome-button" Click="OpenSettings" ToolTip.Tip="Configurações">
             <LucideIcon Kind="Settings" Size="16" />
+          </Button>
+          <Button x:Name="EqualizerButton" Classes="chrome-button" Click="OpenEqualizer" ToolTip.Tip="Equalizador"
+                  IsEnabled="False" AutomationProperties.Name="Equalizador">
+            <LucideIcon Kind="SlidersVertical" Size="16" />
           </Button>
           <Button Classes="chrome-button" Click="ImportFolderClicked" ToolTip.Tip="Adicionar pasta">
             <LucideIcon Kind="FolderPlus" Size="16" />
@@ -135,7 +142,7 @@
       </Grid>
     </Border>
 
-    <Grid Grid.Row="3" ColumnDefinitions="Auto * Auto Auto" ColumnSpacing="6" Margin="4,7,6,4">
+      <Grid Grid.Row="3" Classes="player-desktop" ColumnDefinitions="Auto * Auto Auto" ColumnSpacing="6" Margin="4,7,6,4">
         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="3">
           <Button Classes="transport-button" Command="{Binding Player.StopCommand}" ToolTip.Tip="Parar">
             <lucide:LucideIcon Kind="Square" Size="17" />
@@ -168,6 +175,47 @@
         <Button Grid.Column="3" Classes="chrome-button" Click="TogglePlaylist" ToolTip.Tip="Mostrar ou ocultar playlist">
           <lucide:LucideIcon Kind="ListMusic" Size="18" />
         </Button>
+    </Grid>
+    
+      <Grid Grid.Row="3" Classes="player-mobile" RowDefinitions="Auto,Auto,Auto,Auto"
+          Background="{DynamicResource Theme.Brush.Toolbar}">
+        <Slider x:Name="MobileTimeSlider" Classes="time-slider" Margin="12,0"
+                Minimum="0" Maximum="{Binding Player.DurationSeconds}"
+                Value="{Binding Player.PositionSeconds, Mode=TwoWay}"
+                AutomationProperties.Name="Posição da reprodução" />
+      <WrapPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+        <Button Classes="transport-button" Command="{Binding Player.StopCommand}" ToolTip.Tip="Parar"
+                AutomationProperties.Name="Parar"><lucide:LucideIcon Kind="Square" Size="18" /></Button>
+        <Button Classes="transport-button" Command="{Binding Player.PreviousCommand}" ToolTip.Tip="Anterior"
+                AutomationProperties.Name="Anterior"><lucide:LucideIcon Kind="SkipBack" Size="20" /></Button>
+        <Button Classes="transport-button" Command="{Binding Player.TogglePlaybackCommand}" ToolTip.Tip="Reproduzir ou pausar"
+                AutomationProperties.Name="Reproduzir ou pausar">
+          <Grid>
+            <lucide:LucideIcon Kind="Play" Size="20" IsVisible="{Binding !Player.IsPlaying}" />
+            <lucide:LucideIcon Kind="Pause" Size="20" IsVisible="{Binding Player.IsPlaying}" />
+          </Grid>
+        </Button>
+        <Button Classes="transport-button" Command="{Binding Player.NextCommand}" ToolTip.Tip="Próxima"
+                AutomationProperties.Name="Próxima"><lucide:LucideIcon Kind="SkipForward" Size="20" /></Button>
+        <Button Classes="transport-button" Click="OpenSettings" ToolTip.Tip="Configurações"
+                AutomationProperties.Name="Configurações"><lucide:LucideIcon Kind="Settings" Size="18" /></Button>
+        <Button Classes="transport-button" Click="ImportFolderClicked" ToolTip.Tip="Importar músicas" AutomationProperties.Name="Importar músicas"><lucide:LucideIcon Kind="FolderPlus" Size="18" /></Button>
+        <Button x:Name="MobileEqualizerButton" Classes="transport-button" Click="OpenEqualizer" ToolTip.Tip="Equalizador"
+                IsEnabled="False" AutomationProperties.Name="Equalizador">
+          <lucide:LucideIcon Kind="SlidersVertical" Size="18" />
+        </Button>
+        <Button Classes="transport-button" Click="TogglePlaylist" ToolTip.Tip="Mostrar ou ocultar playlist"
+                AutomationProperties.Name="Mostrar ou ocultar playlist"><lucide:LucideIcon Kind="ListMusic" Size="20" /></Button>
+      </WrapPanel>
+      <StackPanel Grid.Row="2" Margin="12,0">
+        <TextBlock Text="Importando músicas…" IsVisible="{Binding IsImporting}" />
+        <TextBlock Text="{Binding LibraryError}" TextWrapping="Wrap" MaxHeight="80"
+                   Foreground="{DynamicResource Theme.Brush.Danger}" />
+      </StackPanel>
+      <spectrum:AudioSpectrum Grid.Row="3" Height="32" Margin="16,0"
+                              IsVisible="{Binding Player.SpectrumSource, Converter={x:Static ObjectConverters.IsNotNull}}"
+                              Source="{Binding Player.SpectrumSource}" />
+    </Grid>
     </Grid>
   </Grid>
 </UserControl>

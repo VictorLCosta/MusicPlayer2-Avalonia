@@ -30,6 +30,7 @@ public sealed class LibraryService(
             .ConfigureAwait(false);
     }
     private const int SaveBatchSize = 100;
+    public static bool IsSupportedAudioExtension(string extension) => SupportedAudioExtensions.Contains(extension);
 
     private static readonly HashSet<string> SupportedAudioExtensions = new(StringComparer.OrdinalIgnoreCase)
     {

@@ -1,0 +1,96 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:player="using:MusicPlayer2_Avalonia.Styles.NowPlaying">
+  <!-- Layout compacto por padrão; desktop a partir de 660 DIPs de largura disponível. -->
+  <Style Selector=":is(Control).player-desktop">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+  <Style Selector="player|NowPlaying#PlayerPanel">
+    <Setter Property="Grid.ColumnSpan" Value="2" />
+  </Style>
+  <Style Selector="Border#PlaylistPanel">
+    <Setter Property="Grid.Column" Value="0" />
+    <Setter Property="Grid.ColumnSpan" Value="2" />
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+  <Style Selector="Grid.playlist-open Border#PlaylistPanel">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+  <Style Selector="Grid.playlist-open player|NowPlaying#PlayerPanel">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="Grid.player-mobile Button.transport-button">
+    <Setter Property="Height" Value="44" />
+    <Setter Property="Width" Value="44" />
+  </Style>
+
+  <ContainerQuery Name="player" Query="min-width:660">
+    <Style Selector=":is(Control).player-desktop">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector=":is(Control).player-mobile">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="player|NowPlaying#PlayerPanel">
+      <Setter Property="Grid.ColumnSpan" Value="1" />
+    </Style>
+    <Style Selector="Grid.playlist-closed player|NowPlaying#PlayerPanel">
+      <Setter Property="Grid.ColumnSpan" Value="2" />
+    </Style>
+    <Style Selector="Border#PlaylistPanel">
+      <Setter Property="Grid.Column" Value="1" />
+      <Setter Property="Grid.ColumnSpan" Value="1" />
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="Grid.playlist-closed Border#PlaylistPanel">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="Grid.playlist-open player|NowPlaying#PlayerPanel">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ContainerQuery>
+  
+  <!-- Configurações: seletor no topo no compacto e navegação lateral no desktop. -->
+  <Style Selector="Border.settings-navigation">
+    <Setter Property="DockPanel.Dock" Value="Top" />
+    <Setter Property="Padding" Value="12,8" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+  </Style>
+  <Style Selector="ListBox.settings-desktop-menu">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+  <Style Selector="StackPanel.settings-form">
+    <Setter Property="Margin" Value="12" />
+  </Style>
+  <Style Selector="WrapPanel.settings-actions">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+  </Style>
+  <Style Selector="WrapPanel.settings-actions > Button, WrapPanel.settings-folder-actions > Button">
+    <Setter Property="Margin" Value="0,4,8,4" />
+    <Setter Property="MinHeight" Value="44" />
+  </Style>
+
+  <ContainerQuery Name="settings" Query="min-width:660">
+    <Style Selector="Border.settings-navigation">
+      <Setter Property="DockPanel.Dock" Value="Left" />
+      <Setter Property="Padding" Value="8" />
+      <Setter Property="BorderThickness" Value="0,0,1,0" />
+    </Style>
+    <Style Selector="ListBox.settings-desktop-menu">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="ComboBox.settings-mobile-menu">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="TransitioningContentControl.settings-page">
+      <Setter Property="Padding" Value="8,0" />
+    </Style>
+    <Style Selector="StackPanel.settings-form">
+      <Setter Property="Margin" Value="20" />
+    </Style>
+    <Style Selector="WrapPanel.settings-actions">
+      <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+  </ContainerQuery>
+</Styles>

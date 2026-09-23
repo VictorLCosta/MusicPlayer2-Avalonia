@@ -16,6 +16,37 @@
             "problemMatcher": "$msCompile"
         },
         {
+            "label": "run-debug-android",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/Hosts/Android/MusicPlayer2-Avalonia.Android.csproj",
+                "-t:Run",
+                "-m:1",
+                "-p:TargetFramework=net10.0-android",
+                "-p:Configuration=Debug",
+                "-p:AndroidAttachDebugger=true",
+                "-p:AndroidSdbHostPort=10000",
+                "-p:AndroidSdbTargetPort=10000"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build-android",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/Hosts/Android/MusicPlayer2-Avalonia.Android.csproj",
+                "--configuration",
+                "Debug",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "build",
             "command": "dotnet",
             "type": "process",

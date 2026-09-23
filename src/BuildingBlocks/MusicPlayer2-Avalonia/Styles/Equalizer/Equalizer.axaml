@@ -1,143 +1,22 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:lucide="using:Lucide.Avalonia"
              xmlns:models="using:MusicPlayer2_Avalonia.Models"
              x:Class="MusicPlayer2_Avalonia.Styles.Equalizer.Equalizer"
              x:Name="Root">
-
-  <UserControl.Resources>
-
-    <!-- Pequenos segmentos verdes repetidos verticalmente -->
-    <DrawingBrush x:Key="LedBrush"
-                  TileMode="Tile"
-                  SourceRect="0,0,8,5"
-                  DestinationRect="0,0,8,5"
-                  Stretch="None">
-        <DrawingBrush.Drawing>
-            <GeometryDrawing Brush="#51FF28"
-                             Geometry="M0,0 L8,0 L8,2 L0,2 Z" />
-        </DrawingBrush.Drawing>
-    </DrawingBrush>
-
-    <LinearGradientBrush x:Key="MetalBrush"
-                         StartPoint="0%,0%"
-                         EndPoint="0%,100%">
-        <GradientStop Offset="0" Color="#82907A" />
-        <GradientStop Offset="0.25" Color="#3A4436" />
-        <GradientStop Offset="0.5" Color="#10150F" />
-        <GradientStop Offset="0.8" Color="#252E21" />
-        <GradientStop Offset="1" Color="#59664D" />
-    </LinearGradientBrush>
-
-  </UserControl.Resources>
-
-  <UserControl.Styles>
-
-    <Style Selector="Slider.cool-slider">
-      <Setter Property="Orientation" Value="Vertical" />
-      <Setter Property="Minimum" Value="-12" />
-      <Setter Property="Maximum" Value="12" />
-      <Setter Property="TickFrequency" Value="1" />
-      <Setter Property="IsSnapToTickEnabled" Value="True" />
-      <Setter Property="IsDirectionReversed" Value="False" />
-      <Setter Property="Width" Value="36" />
-
-      <Setter Property="Template">
-        <Setter.Value>
-          <ControlTemplate>
-            <Border BorderBrush="White"
-                    BorderThickness="1"
-                    Padding="2">
-
-              <Grid>
-                <!-- Canal central -->
-                <Border Background="#10200C"
-                        HorizontalAlignment="Center" />
-
-                  <Track x:Name="PART_Track"
-                         Orientation="Vertical"
-                         IsDirectionReversed="{TemplateBinding IsDirectionReversed}"
-                         Minimum="{TemplateBinding Minimum}"
-                         Maximum="{TemplateBinding Maximum}"
-                         Value="{Binding Value,
-                                       RelativeSource={RelativeSource TemplatedParent},
-                                       Mode=TwoWay}">
-
-                    <!-- Região entre o mínimo e o puxador -->
-                    <Track.DecreaseButton>
-                      <RepeatButton x:Name="PART_DecreaseButton"
-                                    Focusable="False">
-                        <RepeatButton.Template>
-                          <ControlTemplate>
-                            <Border Width="8"
-                                    HorizontalAlignment="Center"
-                                    Background="{StaticResource LedBrush}"
-                                    BoxShadow="0 0 7 1 #8051FF28" />
-                          </ControlTemplate>
-                        </RepeatButton.Template>
-                      </RepeatButton>
-                    </Track.DecreaseButton>
-
-                    <!-- Região acima do puxador -->
-                    <Track.IncreaseButton>
-                        <RepeatButton
-                            x:Name="PART_IncreaseButton"
-                            Focusable="False">
-                            <RepeatButton.Template>
-                                <ControlTemplate>
-                                    <Border Background="Transparent" />
-                                </ControlTemplate>
-                            </RepeatButton.Template>
-                        </RepeatButton>
-                    </Track.IncreaseButton>
-
-                    <Track.Thumb>
-                        <Thumb x:Name="PART_Thumb">
-                            <Thumb.Template>
-                                <ControlTemplate>
-                                  <Border Cursor="Hand"
-                                          Background="Transparent"
-                                          Height="12"
-                                          Margin="0,0,0,8">
-                                    <lucide:LucideIcon Kind="Zap" 
-                                                       Foreground="#51FF28" 
-                                                       Size="12" />
-                                  </Border>
-                                </ControlTemplate>
-                            </Thumb.Template>
-                        </Thumb>
-                  </Track.Thumb>
-                </Track>
-              </Grid>
-            </Border>
-          </ControlTemplate>
-        </Setter.Value>
-      </Setter>
-    </Style>
-
-  </UserControl.Styles>
-
-  <StackPanel Spacing="8">
-    <TextBlock Text="Equalizer" />
-
-    <ItemsControl ItemsSource="{Binding Bands, ElementName=Root}" Background="Red">
-      <ItemsControl.ItemsPanel>
-        <ItemsPanelTemplate>
-          <WrapPanel Orientation="Horizontal" />
-        </ItemsPanelTemplate>
-      </ItemsControl.ItemsPanel>
-      <ItemsControl.ItemTemplate>
-        <DataTemplate x:DataType="models:EqualizerBand">
-          <StackPanel Spacing="4">
-            <TextBlock Text="{Binding Gain, StringFormat='{}{0:+0;-0;0} dB'}" HorizontalAlignment="Center" />
-
-            <Slider Classes="cool-slider" Value="{Binding Gain}" />
-
-            <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" />
-          </StackPanel>
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
-    </ItemsControl>
-  </StackPanel>
-
+  <ItemsControl ItemsSource="{Binding Bands, ElementName=Root}">
+    <ItemsControl.ItemsPanel>
+      <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="6" /></ItemsPanelTemplate>
+    </ItemsControl.ItemsPanel>
+    <ItemsControl.ItemTemplate>
+      <DataTemplate x:DataType="models:EqualizerBand">
+        <StackPanel Width="48" Spacing="8">
+          <TextBlock Text="{Binding Gain, StringFormat='{}{0:+0;-0;0} dB'}" HorizontalAlignment="Center" FontSize="12" />
+          <Slider Orientation="Vertical" Height="165" Minimum="-12" Maximum="12" TickFrequency="1"
+                  IsSnapToTickEnabled="True" Value="{Binding Gain, Mode=TwoWay}"
+                  HorizontalAlignment="Center" AutomationProperties.Name="{Binding Label}" />
+          <TextBlock Text="{Binding Label}" HorizontalAlignment="Center" FontSize="11" />
+        </StackPanel>
+      </DataTemplate>
+    </ItemsControl.ItemTemplate>
+  </ItemsControl>
 </UserControl>

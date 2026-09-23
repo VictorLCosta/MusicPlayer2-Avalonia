@@ -1,39 +1,73 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:spectrum="using:MusicPlayer2_Avalonia.Styles.AudioSpectrum"
+             xmlns:b="using:MusicPlayer2_Avalonia.Behaviors"
              x:Class="MusicPlayer2_Avalonia.Styles.NowPlaying.NowPlaying"
              x:Name="Root">
-  <Grid RowDefinitions="*,Auto" Margin="20,4,24,12">
-    <StackPanel Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                Spacing="12">
-      <Border Width="184" Height="184" Background="{DynamicResource Theme.Brush.Cover}"
+  <Grid>
+    <Grid Classes="player-desktop" RowDefinitions="*,Auto" Margin="20,4,24,12">
+      <StackPanel Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                  Spacing="12">
+        <Border Width="184" Height="184" Background="{DynamicResource Theme.Brush.Cover}"
+                IsVisible="{Binding ShowAlbumCover, ElementName=Root}"
+                CornerRadius="0" HorizontalAlignment="Center">          
+          <Grid>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"
+                        IsVisible="{Binding Artwork, ElementName=Root, Converter={x:Static ObjectConverters.IsNull}}">
+              <LucideIcon Kind="Music" Size="30" Foreground="{DynamicResource Theme.Brush.TextMuted}"
+                        HorizontalAlignment="Center" />
+              <TextBlock Text="Sem capa" FontSize="16" Opacity="0.6" HorizontalAlignment="Center" />
+            </StackPanel>
+            <Image Source="{Binding Artwork, ElementName=Root}" Stretch="UniformToFill" />
+          </Grid>
+        </Border>
+        <TextBlock Text="{Binding CurrentTrack.Title, ElementName=Root, TargetNullValue='Nenhuma música em reprodução'}"
+                  FontSize="15" TextAlignment="Center" TextWrapping="Wrap"
+                  Foreground="{DynamicResource Theme.Brush.Text}" />
+        <TextBlock Text="{Binding CurrentTrack.ArtistName, ElementName=Root}"
+                  TextAlignment="Center" TextTrimming="CharacterEllipsis"
+                  Foreground="{DynamicResource Theme.Brush.TextMuted}" />
+        <TextBlock Text="{Binding CurrentTrack.AlbumTitle, ElementName=Root}"
+                  TextAlignment="Center" TextTrimming="CharacterEllipsis"
+                  Foreground="{DynamicResource Theme.Brush.TextMuted}" />
+        <spectrum:AudioSpectrum Height="48" Margin="0,2,0,0"
+                                      IsVisible="{Binding SpectrumSource, ElementName=Root, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                      Source="{Binding SpectrumSource, ElementName=Root}" />
+      </StackPanel>
+      <TextBlock Grid.Row="1" Text="{Binding ErrorMessage, ElementName=Root}"
+                Foreground="{DynamicResource Theme.Brush.Danger}" TextWrapping="Wrap"
+                TextAlignment="Center" />
+    </Grid>
+    <Grid Classes="player-mobile" RowDefinitions="*,Auto" ClipToBounds="True">
+      <Border Background="{DynamicResource Theme.Brush.Cover}"
               IsVisible="{Binding ShowAlbumCover, ElementName=Root}"
-              CornerRadius="0" HorizontalAlignment="Center">
+              b:EventBindingBehavior.EventName="SwipeGestureEnded"
+              b:EventBindingBehavior.PassEventArgsToCommand="True"
+              b:EventBindingBehavior.Command="{Binding SwipeCommand, ElementName=Root}">
+        <Border.GestureRecognizers>
+          <SwipeGestureRecognizer CanVerticallySwipe="False" CanHorizontallySwipe="True" />
+        </Border.GestureRecognizers>
+        
         <Grid>
           <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"
                       IsVisible="{Binding Artwork, ElementName=Root, Converter={x:Static ObjectConverters.IsNull}}">
-            <TextBlock Text="♫" FontSize="42" Foreground="{DynamicResource Theme.Brush.TextMuted}"
-                       HorizontalAlignment="Center" />
-            <TextBlock Text="Sem capa" FontSize="12" Opacity="0.6" HorizontalAlignment="Center" />
+            <LucideIcon Kind="Music" Size="64" HorizontalAlignment="Center" />
+            <TextBlock Text="Sem capa" HorizontalAlignment="Center" />
           </StackPanel>
           <Image Source="{Binding Artwork, ElementName=Root}" Stretch="UniformToFill" />
         </Grid>
       </Border>
-      <TextBlock Text="{Binding CurrentTrack.Title, ElementName=Root, TargetNullValue='Nenhuma música em reprodução'}"
-                 FontSize="15" TextAlignment="Center" TextWrapping="Wrap"
-                 Foreground="{DynamicResource Theme.Brush.Text}" />
-      <TextBlock Text="{Binding CurrentTrack.ArtistName, ElementName=Root}"
-                 TextAlignment="Center" TextTrimming="CharacterEllipsis"
-                 Foreground="{DynamicResource Theme.Brush.TextMuted}" />
-      <TextBlock Text="{Binding CurrentTrack.AlbumTitle, ElementName=Root}"
-                 TextAlignment="Center" TextTrimming="CharacterEllipsis"
-                 Foreground="{DynamicResource Theme.Brush.TextMuted}" />
-      <spectrum:AudioSpectrum Height="48" Margin="0,2,0,0"
-                                     IsVisible="{Binding SpectrumSource, ElementName=Root, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                     Source="{Binding SpectrumSource, ElementName=Root}" />
-    </StackPanel>
-    <TextBlock Grid.Row="1" Text="{Binding ErrorMessage, ElementName=Root}"
-               Foreground="{DynamicResource Theme.Brush.Danger}" TextWrapping="Wrap"
-               TextAlignment="Center" />
+      <Border VerticalAlignment="Bottom" Background="#80000000" Padding="24,12,24,16">
+        <StackPanel Spacing="4">
+          <TextBlock Text="{Binding CurrentTrack.ArtistName, ElementName=Root}"
+                     Foreground="White" FontSize="14" TextTrimming="CharacterEllipsis" />
+          <TextBlock Text="{Binding CurrentTrack.Title, ElementName=Root, TargetNullValue='Nenhuma música em reprodução'}"
+                     Foreground="White" FontSize="22" TextTrimming="CharacterEllipsis" />
+        </StackPanel>
+      </Border>
+      <TextBlock Grid.Row="1" Text="{Binding ErrorMessage, ElementName=Root}"
+                 Foreground="{DynamicResource Theme.Brush.Danger}" TextWrapping="Wrap"
+                 TextAlignment="Center" />
+  </Grid>  
   </Grid>
 </UserControl>

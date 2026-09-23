@@ -33,9 +33,9 @@ jobs:
             rid: win-x64
           - os: ubuntu-latest
             rid: linux-x64
-          - os: macos-13
+          - os: macos-15-intel
             rid: osx-x64
-          - os: macos-14
+          - os: macos-26
             rid: osx-arm64
     steps:
       - uses: actions/checkout@v7
@@ -70,7 +70,7 @@ jobs:
             <key>CFBundleExecutable</key>
             <string>$appName</string>
             <key>CFBundleIdentifier</key>
-            <string>com.companyname.musicplayer2avalonia</string>
+            <string>io.github.victorlcosta.musicplayer2.desktop</string>
             <key>CFBundleName</key>
             <string>MusicPlayer2</string>
             <key>CFBundlePackageType</key>
@@ -85,11 +85,23 @@ jobs:
           </plist>
           "@ | Set-Content -Path (Join-Path $contentsDirectory 'Info.plist') -NoNewline
 
+      - name: Package desktop artifact
+        run: |
+          Copy-Item docs/desktop-installation.md artifacts/package/INSTALL.md
+          New-Item -ItemType Directory -Force -Path artifacts/upload | Out-Null
+          if ($env:RUNNER_OS -eq 'Windows') {
+            Compress-Archive -Path 'artifacts/package/*' -DestinationPath 'artifacts/upload/MusicPlayer2-${{ matrix.rid }}.zip'
+          } else {
+            # tar preserves executable bits and symlinks inside the downloaded artifact.
+            tar -czf 'artifacts/upload/MusicPlayer2-${{ matrix.rid }}.tar.gz' -C artifacts/package .
+            if ($LASTEXITCODE -ne 0) { throw 'Desktop archive creation failed.' }
+          }
+
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
           name: MusicPlayer2-Avalonia-Desktop-${{ matrix.rid }}
-          path: artifacts/package
+          path: artifacts/upload
           if-no-files-found: error
           retention-days: 14
 
@@ -104,11 +116,11 @@ jobs:
       - name: Restore WebAssembly workload
         run: dotnet workload restore src/Hosts/Browser/MusicPlayer2-Avalonia.Browser.csproj
       - name: Publish
-        run: dotnet publish src/Hosts/Browser/MusicPlayer2-Avalonia.Browser.csproj --configuration $env:CONFIGURATION -p:PublishTrimmed=false
+        run: dotnet publish src/Hosts/Browser/MusicPlayer2-Avalonia.Browser.csproj --configuration $env:CONFIGURATION -p:PublishTrimmed=false --output artifacts/browser-publish
       - name: Stage static site
         run: |
-          $wwwroot = 'src/Hosts/Browser/bin/Release/net10.0-browser/publish/wwwroot'
-          if (-not (Test-Path $wwwroot)) {
+          $wwwroot = 'artifacts/browser-publish/wwwroot'
+          if (-not (Test-Path "$wwwroot/index.html") -or -not (Test-Path "$wwwroot/_framework")) {
             throw "WebAssembly output was not found at $wwwroot."
           }
           New-Item -ItemType Directory -Force -Path artifacts/browser | Out-Null
@@ -167,15 +179,16 @@ jobs:
             -p:AndroidSigningKeyAlias=$env:ANDROID_KEY_ALIAS `
             -p:AndroidSigningKeyPass=file:$env:ANDROID_KEY_PASSWORD_FILE `
             -p:AndroidSigningStorePass=file:$env:ANDROID_KEYSTORE_PASSWORD_FILE `
-            '-p:AndroidPackageFormats=aab;apk'
+            '-p:AndroidPackageFormats=aab%3Bapk'
 
       - name: Stage signed packages
         run: |
           $publishDirectory = 'src/Hosts/Android/bin/Release/net10.0-android/publish'
           $packages = Get-ChildItem -Path $publishDirectory -Recurse -File |
             Where-Object { $_.Extension -in '.aab', '.apk' }
-          if (-not $packages) {
-            throw 'No Android APK or AAB was produced.'
+          if (-not ($packages | Where-Object Extension -eq '.apk') -or
+              -not ($packages | Where-Object Extension -eq '.aab')) {
+            throw 'Android publishing must produce both APK and AAB packages.'
           }
           New-Item -ItemType Directory -Force -Path artifacts/android | Out-Null
           $packages | Copy-Item -Destination artifacts/android
@@ -190,8 +203,10 @@ jobs:
 
   ios:
     name: iOS (arm64)
-    runs-on: macos-14
+    runs-on: macos-26
     env:
+      # Keep this aligned with the .NET iOS workload selected by global.json.
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
       IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
       IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
       IOS_PROVISION_PROFILE_BASE64: ${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}

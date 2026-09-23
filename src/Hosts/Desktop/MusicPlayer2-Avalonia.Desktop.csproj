@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\BuildingBlocks\MusicPlayer2-Avalonia.Infrastructure.Desktop\MusicPlayer2-Avalonia.Infrastructure.Desktop.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\MusicPlayer2-Avalonia.Infrastructure\MusicPlayer2-Avalonia.Infrastructure.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\MusicPlayer2-Avalonia\MusicPlayer2-Avalonia.csproj" />
   </ItemGroup>

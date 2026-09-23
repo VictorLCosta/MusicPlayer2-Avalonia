@@ -83,6 +83,14 @@ jobs:
         run: dotnet workload restore src/Hosts/iOS/MusicPlayer2-Avalonia.iOS.csproj
       - name: Restore
         run: dotnet restore src/Hosts/iOS/MusicPlayer2-Avalonia.iOS.csproj
+      - name: Verify iOS audio dependency isolation
+        run: |
+          $assets = Get-Content src/Hosts/iOS/obj/project.assets.json -Raw | ConvertFrom-Json
+          $desktopDependencies = @($assets.libraries.PSObject.Properties.Name |
+            Where-Object { $_ -match '^(LibVLCSharp|VideoLAN\.LibVLC[^/]*|MusicPlayer2-Avalonia\.Infrastructure\.Desktop)/' })
+          if ($desktopDependencies.Count -gt 0) {
+            throw "iOS uses AVAudioPlayer and must not depend on desktop VLC: $($desktopDependencies -join ', ')"
+          }
       - name: Build
         run: dotnet build src/Hosts/iOS/MusicPlayer2-Avalonia.iOS.csproj --configuration $env:CONFIGURATION --no-restore
 

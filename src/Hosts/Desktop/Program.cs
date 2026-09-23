@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 
-using MusicPlayer2_Avalonia;
 
 
 namespace MusicPlayer2.Avalonia.Desktop;
@@ -13,7 +12,7 @@ sealed class Program
     }
 
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
+        => AppBuilder.Configure<DesktopPlayerApp>()
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();

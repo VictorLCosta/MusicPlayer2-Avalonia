@@ -5,6 +5,7 @@
     <Project Path="src/BuildingBlocks/MusicPlayer2-Avalonia.Application/MusicPlayer2-Avalonia.Application.csproj" />
     <Project Path="src/BuildingBlocks/MusicPlayer2-Avalonia.Domain/MusicPlayer2-Avalonia.Domain.csproj" />
     <Project Path="src/BuildingBlocks/MusicPlayer2-Avalonia.Infrastructure/MusicPlayer2-Avalonia.Infrastructure.csproj" />
+    <Project Path="src/BuildingBlocks/MusicPlayer2-Avalonia.Infrastructure.Desktop/MusicPlayer2-Avalonia.Infrastructure.Desktop.csproj" />
   </Folder>
   <Folder Name="/src/Hosts/" />
   <Folder Name="/src/Hosts/Android/">

@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="LibVLCSharp" />
+    <ProjectReference Include="../MusicPlayer2-Avalonia.Application/MusicPlayer2-Avalonia.Application.csproj" />
+  </ItemGroup>
+</Project>

@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 using MusicPlayer2_Avalonia.Application.Common;
 using MusicPlayer2_Avalonia.Application.Common.Storage;
-using MusicPlayer2_Avalonia.Infrastructure.AudioEngine;
 using MusicPlayer2_Avalonia.Infrastructure.Metadata;
 using MusicPlayer2_Avalonia.Infrastructure.Persistence;
 using MusicPlayer2_Avalonia.Infrastructure.Storage;
@@ -18,7 +17,6 @@ public static class DependencyInjection
         services.AddPersistence(connectionString);
         services.AddScoped<IMetaDataReader, MetadataReader>();
         services.AddSingleton<IAlbumArtworkReader, AlbumArtworkReader>();
-        services.AddSingleton<IAudioEngine, VlcAudioEngine>();
 
         return services;
     }

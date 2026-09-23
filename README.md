@@ -146,6 +146,8 @@ dotnet build MusicPlayer2-Avalonia.slnx
 
 ### Mobile release builds
 
+The VLC backend and its `LibVLCSharp` dependency live in `MusicPlayer2-Avalonia.Infrastructure.Desktop`, referenced only by the Desktop host and its equalizer checks. Shared infrastructure does not register an audio engine; each host registers its own. This keeps VLC native framework requirements out of iOS, Android and Browser builds.
+
 Mobile hosts currently preserve managed code because the Avalonia XAML dependency metadata and the reflection-based EF Core, SQLite and TagLibSharp dependencies have not been validated with trimming. Android disables `PublishTrimmed` and `RunAOTCompilation` (Android AOT requires trimming). iOS uses `TrimMode=copy` to preserve assemblies while retaining the required Apple linker pipeline. Compiler warnings still fail the build.
 
 This compatibility configuration trades package size and Android AOT startup optimizations for preserving code used at runtime. Re-enable trimming only after resolving linker diagnostics and testing imports, database access, metadata reading and playback on devices. iOS native linking and signing must be validated on macOS.

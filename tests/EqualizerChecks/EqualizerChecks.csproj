@@ -4,6 +4,6 @@
     <EnableNETAnalyzers>false</EnableNETAnalyzers>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../../src/BuildingBlocks/MusicPlayer2-Avalonia.Infrastructure/MusicPlayer2-Avalonia.Infrastructure.csproj" />
+    <ProjectReference Include="../../src/BuildingBlocks/MusicPlayer2-Avalonia.Infrastructure.Desktop/MusicPlayer2-Avalonia.Infrastructure.Desktop.csproj" />
   </ItemGroup>
 </Project>

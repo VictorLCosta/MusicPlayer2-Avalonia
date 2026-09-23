@@ -50,7 +50,12 @@
                                SpectrumSource="{Binding Player.SpectrumSource}"
                                ShowAlbumCover="{Binding Player.ShowAlbumCover}"
                                ErrorMessage="{Binding Player.ErrorMessage}"
-                               SwipeCommand="{Binding SwipeCommand}" />
+                               PreviousArtwork="{Binding Player.PreviousArtwork}"
+                               NextArtwork="{Binding Player.NextArtwork}"
+                               HasPreviousTrack="{Binding Player.HasPreviousTrack}"
+                               HasNextTrack="{Binding Player.HasNextTrack}"
+                               PreviousCommand="{Binding Player.PreviousCommand}"
+                               NextCommand="{Binding Player.NextCommand}" />
           
         <Border x:Name="PlaylistPanel" Padding="4,0,8,8">
           <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="5">
@@ -220,12 +225,13 @@
         <Button Classes="transport-button" Click="TogglePlaylist" ToolTip.Tip="{DynamicResource Text.TogglePlaylist}"
                 AutomationProperties.Name="{DynamicResource Text.TogglePlaylist}"><lucide:LucideIcon Kind="ListMusic" Size="20" /></Button>
       </WrapPanel>
-      <StackPanel Grid.Row="4" Margin="12,0">
+      <StackPanel Grid.Row="3" Margin="12,0">
         <TextBlock Text="{DynamicResource Text.Importing}" IsVisible="{Binding IsImporting}" />
         <TextBlock Text="{Binding LibraryError}" TextWrapping="Wrap" MaxHeight="80"
+                   IsVisible="{Binding LibraryError, Converter={x:Static ObjectConverters.IsNotNull}}"
                    Foreground="{DynamicResource Theme.Brush.Danger}" />
       </StackPanel>
-      <spectrum:AudioSpectrum Grid.Row="3" Height="44" Margin="16,0,16,4" BarBrush="{DynamicResource Theme.Brush.Text}"
+      <spectrum:AudioSpectrum Grid.Row="4" Height="44" Margin="16,0,16,0" ShowReflection="False" BarBrush="{DynamicResource Theme.Brush.Text}"
                               IsVisible="{Binding Player.SpectrumSource, Converter={x:Static ObjectConverters.IsNotNull}}"
                               Source="{Binding Player.SpectrumSource}" />
     </Grid>

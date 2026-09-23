@@ -15,7 +15,6 @@ using MusicPlayer2_Avalonia.Application.Playlist.Models;
 using MusicPlayer2_Avalonia.Application.Settings;
 using MusicPlayer2_Avalonia.Application.Settings.Models;
 using MusicPlayer2_Avalonia.Models;
-using Avalonia.Input;
 
 namespace MusicPlayer2_Avalonia.ViewModels;
 
@@ -114,21 +113,6 @@ internal sealed partial class MainViewModel : ViewModelBase
     {
         if (SelectedTrack is { } track)
             await Player.PlayTrackAsync(track, FilteredTracks);
-    }
-
-    [RelayCommand]
-    private async Task SwipeAsync(object? parameter)
-    {
-        if (parameter is SwipeGestureEndedEventArgs e)
-        {
-            if (Math.Abs(e.Velocity.X) > 200)
-            {
-                if (e.Velocity.X < 0) 
-                    await Player.PreviousCommand.ExecuteAsync(null);
-                if (e.Velocity.X > 0)
-                    await Player.NextCommand.ExecuteAsync(null);
-            }
-        }
     }
 
     public async Task LoadTracksAsync()

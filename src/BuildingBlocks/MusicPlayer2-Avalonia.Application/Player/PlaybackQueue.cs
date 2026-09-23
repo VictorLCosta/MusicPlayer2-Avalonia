@@ -4,6 +4,7 @@ public sealed class PlaybackQueue
 {
     private readonly List<Guid> _trackIds = [];
     private int _currentIndex = -1;
+    public long Revision { get; private set; }
 
     public IReadOnlyList<Guid> TrackIds => _trackIds;
 
@@ -11,10 +12,17 @@ public sealed class PlaybackQueue
         ? _trackIds[_currentIndex]
         : null;
 
+    public Guid? Peek(int offset)
+    {
+        var index = (long)_currentIndex + offset;
+        return _currentIndex >= 0 && index >= 0 && index < _trackIds.Count ? _trackIds[(int)index] : null;
+    }
+
     public void Enqueue(Guid trackId)
     {
         ArgumentOutOfRangeException.ThrowIfEqual(trackId, Guid.Empty);
         _trackIds.Add(trackId);
+        Revision++;
     }
 
     public void Replace(IEnumerable<Guid> trackIds)
@@ -39,6 +47,7 @@ public sealed class PlaybackQueue
         }
 
         _currentIndex = index;
+        Revision++;
     }
 
     public bool TryMoveNext(out Guid trackId)
@@ -50,6 +59,7 @@ public sealed class PlaybackQueue
         }
 
         trackId = _trackIds[++_currentIndex];
+        Revision++;
         return true;
     }
 
@@ -62,6 +72,7 @@ public sealed class PlaybackQueue
         }
 
         trackId = _trackIds[--_currentIndex];
+        Revision++;
         return true;
     }
 
@@ -69,5 +80,6 @@ public sealed class PlaybackQueue
     {
         _trackIds.Clear();
         _currentIndex = -1;
+        Revision++;
     }
 }

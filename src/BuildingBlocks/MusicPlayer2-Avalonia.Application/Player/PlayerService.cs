@@ -66,6 +66,21 @@ public sealed class PlayerService : IDisposable
 
     public void Pause() => _audioEngine.Pause();
 
+    public async Task<(Guid Id, string Path)?> GetAdjacentTrackAsync(int offset)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(offset, -1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(offset, 1);
+        await _playbackCommands.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (_playbackQueue.Peek(offset) is not { } id) return null;
+            var track = await _dbContext.Tracks.AsNoTracking()
+                .FirstOrDefaultAsync(item => item.Id == id).ConfigureAwait(false);
+            return track is null ? null : (track.Id, track.Source.Path);
+        }
+        finally { _playbackCommands.Release(); }
+    }
+
     public void Resume()
     {
         if (CurrentTrack is null)
@@ -115,22 +130,26 @@ public sealed class PlayerService : IDisposable
 
     public Task NextAsync(CancellationToken cancellationToken = default) => SerializePlaybackAsync(async () =>
     {
-        if (!_playbackQueue.TryMoveNext(out var trackId))
+        var trackId = _playbackQueue.Peek(1) ?? (_playbackQueue.CurrentTrackId is null
+            ? _playbackQueue.TrackIds[0] : Guid.Empty);
+        if (trackId == Guid.Empty)
         {
             return;
         }
 
         await LoadAndPlayAsync(trackId, cancellationToken).ConfigureAwait(false);
+        _playbackQueue.TryMoveNext(out _);
     }, cancellationToken);
 
     public Task PreviousAsync(CancellationToken cancellationToken = default) => SerializePlaybackAsync(async () =>
     {
-        if (!_playbackQueue.TryMovePrevious(out var trackId))
+        if (_playbackQueue.Peek(-1) is not { } trackId)
         {
             return;
         }
 
         await LoadAndPlayAsync(trackId, cancellationToken).ConfigureAwait(false);
+        _playbackQueue.TryMovePrevious(out _);
     }, cancellationToken);
 
     public void Seek(TimeSpan position)

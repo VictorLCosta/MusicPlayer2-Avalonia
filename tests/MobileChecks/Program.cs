@@ -65,6 +65,22 @@ var player = services.GetRequiredService<PlayerService>();
 await Task.WhenAll(player.PlayAsync(tracks[0].TrackId), player.PlayAsync(tracks[1].TrackId));
 Check(audioEngine.MaximumConcurrentLoads == 1 && player.CurrentTrack?.Id == tracks[1].TrackId,
     "UI and remote playback commands serialize asynchronous track preparation");
+var queue = services.GetRequiredService<PlaybackQueue>();
+var preview = await player.GetAdjacentTrackAsync(-1);
+Check(preview?.Id == tracks[0].TrackId && queue.CurrentTrackId == tracks[1].TrackId,
+    "adjacent artwork lookup does not move the queue or start playback");
+queue.Enqueue(Guid.NewGuid());
+try { await player.NextAsync(); throw new Exception("Missing track was accepted"); }
+catch (KeyNotFoundException) { }
+Check(queue.CurrentTrackId == tracks[1].TrackId && player.CurrentTrack?.Id == tracks[1].TrackId,
+    "failed swipe target leaves the queue on the original song");
+queue.Replace([tracks[0].TrackId, tracks[0].TrackId, tracks[1].TrackId]);
+await player.NextAsync();
+Check(player.CurrentTrack?.Id == tracks[0].TrackId, "next can start a queue with no selected entry");
+await player.NextAsync();
+Check(queue.Peek(1) == tracks[1].TrackId, "next preserves duplicate entries instead of resetting to the first occurrence");
+await player.NextAsync();
+Check(player.CurrentTrack?.Id == tracks[1].TrackId, "next advances past consecutive duplicate entries");
 Console.WriteLine("All mobile checks passed. Test storage: " + root);
 
 static void Check(bool result, string name)

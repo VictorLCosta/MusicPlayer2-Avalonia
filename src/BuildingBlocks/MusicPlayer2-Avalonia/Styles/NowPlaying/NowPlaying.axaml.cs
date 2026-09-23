@@ -12,6 +12,14 @@ namespace MusicPlayer2_Avalonia.Styles.NowPlaying;
 
 public partial class NowPlaying : UserControl
 {
+    public static readonly StyledProperty<IImage?> PreviousArtworkProperty = AvaloniaProperty.Register<NowPlaying, IImage?>(nameof(PreviousArtwork));
+    public static readonly StyledProperty<IImage?> NextArtworkProperty = AvaloniaProperty.Register<NowPlaying, IImage?>(nameof(NextArtwork));
+    public static readonly StyledProperty<bool> HasPreviousTrackProperty = AvaloniaProperty.Register<NowPlaying, bool>(nameof(HasPreviousTrack));
+    public static readonly StyledProperty<bool> HasNextTrackProperty = AvaloniaProperty.Register<NowPlaying, bool>(nameof(HasNextTrack));
+    public IImage? PreviousArtwork { get => GetValue(PreviousArtworkProperty); set => SetValue(PreviousArtworkProperty, value); }
+    public IImage? NextArtwork { get => GetValue(NextArtworkProperty); set => SetValue(NextArtworkProperty, value); }
+    public bool HasPreviousTrack { get => GetValue(HasPreviousTrackProperty); set => SetValue(HasPreviousTrackProperty, value); }
+    public bool HasNextTrack { get => GetValue(HasNextTrackProperty); set => SetValue(HasNextTrackProperty, value); }
     public static readonly StyledProperty<IAudioSpectrumSource?> SpectrumSourceProperty =
         AvaloniaProperty.Register<NowPlaying, IAudioSpectrumSource?>(nameof(SpectrumSource));
 
@@ -56,10 +64,6 @@ public partial class NowPlaying : UserControl
     public static readonly StyledProperty<ICommand?> NextCommandProperty =
         AvaloniaProperty.Register<NowPlaying, ICommand?>(
             nameof(NextCommand));
-
-    public static readonly StyledProperty<ICommand?> SwipeCommandProperty =
-        AvaloniaProperty.Register<NowPlaying, ICommand?>(
-            nameof(SwipeCommand));
 
     public IAudioSpectrumSource? SpectrumSource
     {
@@ -107,12 +111,6 @@ public partial class NowPlaying : UserControl
     {
         get => GetValue(NextCommandProperty);
         set => SetValue(NextCommandProperty, value);
-    }
-
-    public ICommand? SwipeCommand
-    {
-        get => GetValue(SwipeCommandProperty);
-        set => SetValue(SwipeCommandProperty, value);
     }
 
     public IImage? Artwork

@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:spectrum="using:MusicPlayer2_Avalonia.Styles.AudioSpectrum"
-             xmlns:b="using:MusicPlayer2_Avalonia.Behaviors"
+             xmlns:local="using:MusicPlayer2_Avalonia.Styles.NowPlaying"
              x:Class="MusicPlayer2_Avalonia.Styles.NowPlaying.NowPlaying"
              x:Name="Root">
   <Grid>
@@ -44,37 +44,26 @@
                 TextAlignment="Center" />
     </Grid>
     <Grid Classes="player-mobile" RowDefinitions="*,Auto" ClipToBounds="True">
-      <Border ClipToBounds="True" Background="{DynamicResource Theme.Brush.Cover}"
-              IsVisible="{Binding ShowAlbumCover, ElementName=Root}"
-              b:EventBindingBehavior.EventName="SwipeGestureEnded"
-              b:EventBindingBehavior.PassEventArgsToCommand="True"
-              b:EventBindingBehavior.Command="{Binding SwipeCommand, ElementName=Root}">
-        <Border.GestureRecognizers>
-          <SwipeGestureRecognizer CanVerticallySwipe="False" CanHorizontallySwipe="True" />
-        </Border.GestureRecognizers>
-        
-        <Grid>
-          <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"
-                      IsVisible="{Binding Artwork, ElementName=Root, Converter={x:Static ObjectConverters.IsNull}}">
-            <LucideIcon Kind="Music" Size="64" HorizontalAlignment="Center" />
-            <TextBlock Text="{DynamicResource Text.NoArtwork}" HorizontalAlignment="Center" />
-          </StackPanel>
-          <Image Source="{Binding Artwork, ElementName=Root}" Stretch="UniformToFill" Margin="-24" Opacity="0.55">
-            <Image.Effect><BlurEffect Radius="24" /></Image.Effect>
-          </Image>
-          <Image Source="{Binding Artwork, ElementName=Root}" Stretch="Uniform" />
-        </Grid>
-      </Border>
-      <Border VerticalAlignment="Bottom" Background="#80000000" Padding="16,10,16,12">
-        <StackPanel Spacing="4">
+      <local:ArtworkCarousel x:Name="CoverCarousel"
+                             IsVisible="{Binding ShowAlbumCover, ElementName=Root}"
+                             TrackId="{Binding CurrentTrack.TrackId, ElementName=Root}"
+                             Artwork="{Binding Artwork, ElementName=Root}"
+                             PreviousArtwork="{Binding PreviousArtwork, ElementName=Root}"
+                             NextArtwork="{Binding NextArtwork, ElementName=Root}"
+                             HasPreviousTrack="{Binding HasPreviousTrack, ElementName=Root}"
+                             HasNextTrack="{Binding HasNextTrack, ElementName=Root}"
+                             PreviousCommand="{Binding PreviousCommand, ElementName=Root}"
+                             NextCommand="{Binding NextCommand, ElementName=Root}" />
+      <Border VerticalAlignment="Bottom" Background="#80000000" Padding="24,16,24,20" IsHitTestVisible="False">
+        <StackPanel Spacing="6" Opacity="{Binding CaptionOpacity, ElementName=CoverCarousel}">
           <TextBlock Text="{Binding CurrentTrack.ArtistName, ElementName=Root}"
-                     Foreground="White" FontSize="14" TextTrimming="CharacterEllipsis" />
+                     Foreground="White" FontSize="16" TextTrimming="CharacterEllipsis" />
           <TextBlock Text="{DynamicResource Text.NoTrackPlaying}"
                      IsVisible="{Binding CurrentTrack, ElementName=Root, Converter={x:Static ObjectConverters.IsNull}}"
-                     Foreground="White" FontSize="22" TextTrimming="CharacterEllipsis" />
+                     Foreground="White" FontSize="24" TextTrimming="CharacterEllipsis" />
           <TextBlock Text="{Binding CurrentTrack.Title, ElementName=Root}"
                      IsVisible="{Binding CurrentTrack, ElementName=Root, Converter={x:Static ObjectConverters.IsNotNull}}"
-                     Foreground="White" FontSize="22" TextTrimming="CharacterEllipsis" />
+                     Foreground="White" FontSize="24" TextTrimming="CharacterEllipsis" />
         </StackPanel>
       </Border>
       <TextBlock Grid.Row="1" Text="{Binding ErrorMessage, ElementName=Root}"

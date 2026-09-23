@@ -28,6 +28,9 @@ internal sealed partial class PlayerViewModel : ViewModelBase
     private bool _initialized;
     private readonly IAlbumArtworkReader? _artworkReader;
     private int _artworkRequest;
+    private long _artworkQueueRevision = -1;
+    private Task _artworkLoading = Task.CompletedTask;
+    private readonly Dictionary<Guid, Bitmap?> _artworkCache = [];
     private string? _summaryCulture;
 
     public PlayerViewModel(PlayerService service, PlaybackQueue queue, SettingsService settings,
@@ -47,6 +50,10 @@ internal sealed partial class PlayerViewModel : ViewModelBase
 
     [ObservableProperty] public partial ListTrackDto? CurrentTrack { get; private set; }
     [ObservableProperty] public partial IImage? Artwork { get; set; }
+    [ObservableProperty] public partial IImage? PreviousArtwork { get; private set; }
+    [ObservableProperty] public partial IImage? NextArtwork { get; private set; }
+    [ObservableProperty] public partial bool HasPreviousTrack { get; private set; }
+    [ObservableProperty] public partial bool HasNextTrack { get; private set; }
     [ObservableProperty] public partial bool ShowAlbumCover { get; private set; }
     [ObservableProperty] public partial bool IsPlaying { get; private set; }
     [ObservableProperty] public partial double DurationSeconds { get; private set; }
@@ -134,7 +141,7 @@ internal sealed partial class PlayerViewModel : ViewModelBase
         IsBusy = true;
         try { ErrorMessage = null; await action(); }
         catch (Exception ex) { ErrorMessage = ex.Message; }
-        finally { IsBusy = false; Synchronize(); }
+        finally { IsBusy = false; Synchronize(); await _artworkLoading; }
     }
 
     public void StartUpdating() { Synchronize(); _timer.Start(); }
@@ -177,8 +184,9 @@ internal sealed partial class PlayerViewModel : ViewModelBase
         try
         {
             var track = _service.CurrentTrack;
-            if (track?.Id != CurrentTrack?.TrackId || _summaryCulture != Strings.CultureName)
+            if (track?.Id != CurrentTrack?.TrackId || _summaryCulture != Strings.CultureName || _artworkQueueRevision != _queue.Revision)
             {
+                _artworkQueueRevision = _queue.Revision;
                 _summaryCulture = Strings.CultureName;
                 var audio = track?.AudioProperties;
                 AudioSummary = track is null ? Strings.Get("NoTrackPlaying") : string.Join("  ",
@@ -191,12 +199,12 @@ internal sealed partial class PlayerViewModel : ViewModelBase
                 CurrentTrack = track is null ? null : new ListTrackDto(
                     Guid.Empty, track.Id, 0, track.Title, track.Artist?.Name,
                     track.Album?.Title, track.Duration, track.SourceFileSizeBytes ?? 0);
-                var previous = Artwork as IDisposable;
-                Artwork = null;
-                previous?.Dispose();
                 var request = ++_artworkRequest;
-                if (track is not null && _artworkReader is not null)
-                    _ = LoadArtworkAsync(track.Source.Path, request);
+                Artwork = track is null ? null : _artworkCache.GetValueOrDefault(track.Id);
+                PreviousArtwork = NextArtwork = null;
+                HasPreviousTrack = HasNextTrack = false;
+                _artworkLoading = track is null ? Task.CompletedTask
+                    : LoadArtworkAsync(track.Id, track.Source.Path, request);
             }
             IsPlaying = _service.IsPlaying;
             var duration = _service.Duration.TotalSeconds;
@@ -211,14 +219,30 @@ internal sealed partial class PlayerViewModel : ViewModelBase
     private static string FormatTime(double seconds) => TimeSpan.FromSeconds(seconds)
         .ToString(seconds >= 3600 ? @"h\:mm\:ss" : @"m\:ss", CultureInfo.InvariantCulture);
 
-    private async Task LoadArtworkAsync(string path, int request)
+    private async Task LoadArtworkAsync(Guid id, string path, int request)
     {
         try
         {
-            var bytes = await _artworkReader!.ReadAsync(path);
-            if (bytes is not { Length: > 0 } || request != _artworkRequest) return;
-            using var stream = new MemoryStream(bytes, writable: false);
-            Artwork = Bitmap.DecodeToWidth(stream, 640);
+            var artwork = await ReadArtworkAsync(id, path, request);
+            if (request != _artworkRequest) return;
+            Artwork = artwork;
+            var previous = await _service.GetAdjacentTrackAsync(-1);
+            var next = await _service.GetAdjacentTrackAsync(1);
+            var previousImage = previous is { } p ? await ReadArtworkAsync(p.Id, p.Path, request) : null;
+            var nextImage = next is { } n ? await ReadArtworkAsync(n.Id, n.Path, request) : null;
+            if (request != _artworkRequest) return;
+            PreviousArtwork = previousImage;
+            NextArtwork = nextImage;
+            HasPreviousTrack = previous.HasValue;
+            HasNextTrack = next.HasValue;
+            // Keep the outgoing and adjacent images alive through the slide transition.
+            foreach (var key in _artworkCache.Keys.ToArray())
+            {
+                if (_artworkCache.Count <= 5) break;
+                if (key == id || key == previous?.Id || key == next?.Id) continue;
+                _artworkCache.Remove(key, out var expired);
+                expired?.Dispose();
+            }
         }
         catch (Exception)
         {
@@ -226,11 +250,32 @@ internal sealed partial class PlayerViewModel : ViewModelBase
         }
     }
 
+    private async Task<Bitmap?> ReadArtworkAsync(Guid id, string path, int request)
+    {
+        if (_artworkCache.TryGetValue(id, out var cached)) return cached;
+        Bitmap? bitmap = null;
+        try
+        {
+            var bytes = _artworkReader is null ? null : await _artworkReader.ReadAsync(path);
+            if (bytes is { Length: > 0 } && request == _artworkRequest)
+                bitmap = await Task.Run(() =>
+                {
+                    using var stream = new MemoryStream(bytes, writable: false);
+                    return Bitmap.DecodeToWidth(stream, 960);
+                });
+        }
+        catch (Exception) { /* An unavailable cover must not block the carousel. */ }
+        if (request != _artworkRequest) { bitmap?.Dispose(); return null; }
+        _artworkCache[id] = bitmap;
+        return bitmap;
+    }
+
     public override void Dispose()
     {
         _artworkRequest++;
-        (Artwork as IDisposable)?.Dispose();
-        Artwork = null;
+        Artwork = PreviousArtwork = NextArtwork = null;
+        foreach (var bitmap in _artworkCache.Values) bitmap?.Dispose();
+        _artworkCache.Clear();
         _settings.Changed -= SettingsChanged;
         _timer.Stop();
         _timer.Tick -= OnTick;

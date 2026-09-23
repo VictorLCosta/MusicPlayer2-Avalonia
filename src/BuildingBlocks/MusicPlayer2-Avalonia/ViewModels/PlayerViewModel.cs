@@ -28,6 +28,7 @@ internal sealed partial class PlayerViewModel : ViewModelBase
     private bool _initialized;
     private readonly IAlbumArtworkReader? _artworkReader;
     private int _artworkRequest;
+    private string? _summaryCulture;
 
     public PlayerViewModel(PlayerService service, PlaybackQueue queue, SettingsService settings,
         IEnumerable<IAlbumArtworkReader> artworkReaders, EqualizerService equalizer)
@@ -54,7 +55,7 @@ internal sealed partial class PlayerViewModel : ViewModelBase
     [ObservableProperty] public partial string DurationText { get; private set; } = "0:00";
     [ObservableProperty] public partial string? ErrorMessage { get; private set; }
     [ObservableProperty] public partial bool IsBusy { get; private set; }
-    [ObservableProperty] public partial string AudioSummary { get; private set; } = "Nenhuma música em reprodução";
+    [ObservableProperty] public partial string AudioSummary { get; private set; } = Strings.Get("NoTrackPlaying");
     [ObservableProperty] public partial double VolumePercent { get; set; }
 
     partial void OnVolumePercentChanged(double value)
@@ -160,7 +161,7 @@ internal sealed partial class PlayerViewModel : ViewModelBase
         if (_savingSession || !_initialized) return;
         _savingSession = true;
         try { await _service.SaveSessionAsync(); }
-        catch (Exception) { ErrorMessage = "Não foi possível salvar a posição da reprodução."; }
+        catch (Exception) { ErrorMessage = Strings.Get("PositionSaveFailed"); }
         finally { _savingSession = false; }
     }
 
@@ -176,15 +177,16 @@ internal sealed partial class PlayerViewModel : ViewModelBase
         try
         {
             var track = _service.CurrentTrack;
-            if (track?.Id != CurrentTrack?.TrackId)
+            if (track?.Id != CurrentTrack?.TrackId || _summaryCulture != Strings.CultureName)
             {
+                _summaryCulture = Strings.CultureName;
                 var audio = track?.AudioProperties;
-                AudioSummary = track is null ? "Nenhuma música em reprodução" : string.Join("  ",
+                AudioSummary = track is null ? Strings.Get("NoTrackPlaying") : string.Join("  ",
                     new[] {
                         Path.GetExtension(track.Source.Path).TrimStart('.').ToUpperInvariant(),
                         audio?.SampleRateHz > 0 ? $"{audio.SampleRateHz / 1000d:0.#} kHz" : null,
                         audio?.BitrateKbps > 0 ? $"{audio.BitrateKbps} kbps" : null,
-                        audio?.Channels == 2 ? "Estéreo" : audio?.Channels == 1 ? "Mono" : null
+                        audio?.Channels == 2 ? Strings.Get("Stereo") : audio?.Channels == 1 ? Strings.Get("Mono") : null
                     }.Where(value => !string.IsNullOrWhiteSpace(value)));
                 CurrentTrack = track is null ? null : new ListTrackDto(
                     Guid.Empty, track.Id, 0, track.Title, track.Artist?.Name,

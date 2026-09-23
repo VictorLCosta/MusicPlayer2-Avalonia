@@ -9,6 +9,7 @@
   <ItemGroup>
     <Folder Include="Models\" />
     <InternalsVisibleTo Include="MusicPlayer2-Avalonia.Settings.Tests" />
+    <InternalsVisibleTo Include="LocalizationChecks" />
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 

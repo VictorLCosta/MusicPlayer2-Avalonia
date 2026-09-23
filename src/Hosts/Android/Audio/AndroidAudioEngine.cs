@@ -8,8 +8,64 @@ using NativePlayer = Android.Media.MediaPlayer;
 namespace MusicPlayer2.Avalonia.Android.Audio;
 
 // MediaPlayer and its callbacks are confined to the UI looper. Preparation remains asynchronous.
-internal sealed class AndroidAudioEngine : Java.Lang.Object, IAudioEngine, AudioManager.IOnAudioFocusChangeListener
+internal sealed class AndroidAudioEngine : Java.Lang.Object, IAudioEngine, IAudioSpectrumSource, AudioManager.IOnAudioFocusChangeListener
 {
+    [SuppressMessage("Usage", "CA2213", Justification = "Released by ReleaseSpectrum via StopAudio on the UI looper during Dispose.")]
+    private global::Android.Media.Audiofx.Visualizer? _visualizer;
+    private byte[] _fft = [];
+    private bool _spectrumUnavailable;
+
+    // Called by the UI spectrum timer, on the same looper as MediaPlayer.
+    public void CopySpectrum(Span<float> destination)
+    {
+        destination.Clear();
+        if (!Dispatcher.UIThread.CheckAccess() || _disposed || !_loaded || !_player.IsPlaying ||
+            _spectrumUnavailable || _context.CheckSelfPermission(global::Android.Manifest.Permission.RecordAudio) !=
+            global::Android.Content.PM.Permission.Granted) return;
+        try
+        {
+            if (_visualizer is null)
+            {
+                _visualizer = new global::Android.Media.Audiofx.Visualizer(_player.AudioSessionId);
+                var sizes = global::Android.Media.Audiofx.Visualizer.GetCaptureSizeRange()!;
+                if (_visualizer.SetCaptureSize(sizes[1]) != (int)global::Android.Media.Audiofx.VisualizerStatus.Success)
+                    throw new InvalidOperationException("Audio visualizer capture size is unavailable.");
+                _fft = new byte[sizes[1]];
+                if (_visualizer.SetEnabled(true) != global::Android.Media.Audiofx.VisualizerStatus.Success)
+                    throw new InvalidOperationException("Audio visualizer could not be enabled.");
+            }
+            if (_visualizer.GetFft(_fft) != global::Android.Media.Audiofx.VisualizerStatus.Success) return;
+            var bins = _fft.Length / 2;
+            for (var bar = 0; bar < destination.Length; bar++)
+            {
+                var start = Math.Clamp((int)Math.Pow(bins, (double)bar / destination.Length), 1, bins - 1);
+                var end = Math.Clamp((int)Math.Pow(bins, (double)(bar + 1) / destination.Length), start + 1, bins);
+                double magnitude = 0;
+                for (var bin = start; bin < end; bin++)
+                {
+                    var real = (sbyte)_fft[bin * 2];
+                    var imaginary = (sbyte)_fft[bin * 2 + 1];
+                    magnitude = Math.Max(magnitude, Math.Sqrt(real * real + imaginary * imaginary));
+                }
+                destination[bar] = (float)Math.Clamp(Math.Log10(1 + magnitude) / Math.Log10(182), 0, 1);
+            }
+        }
+        catch (Exception ex) when (ex is Java.Lang.RuntimeException or InvalidOperationException)
+        {
+            ReleaseSpectrum();
+            _spectrumUnavailable = true;
+            System.Diagnostics.Debug.WriteLine(ex);
+        }
+    }
+
+    private void ReleaseSpectrum()
+    {
+        _visualizer?.Release();
+        _visualizer?.Dispose();
+        _visualizer = null;
+        _fft = [];
+    }
+
     private readonly NativePlayer _player = new();
     [SuppressMessage("Usage", "CA2213", Justification = "Application context is owned by Android.")]
     private readonly Context _context = global::Android.App.Application.Context;
@@ -68,6 +124,8 @@ internal sealed class AndroidAudioEngine : Java.Lang.Object, IAudioEngine, Audio
             _preparation = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
             preparation = _preparation.Task;
             _loaded = false;
+            ReleaseSpectrum();
+            _spectrumUnavailable = false;
             _player.Reset();
             using var builder = new AudioAttributes.Builder();
             using var attributes = builder.SetUsage(AudioUsageKind.Media)!.SetContentType(AudioContentType.Music)!.Build();
@@ -97,6 +155,7 @@ internal sealed class AndroidAudioEngine : Java.Lang.Object, IAudioEngine, Audio
             if (OperatingSystem.IsAndroidVersionAtLeast(26)) _context.StartForegroundService(intent);
             else _context.StartService(intent);
             _player.Start();
+            MainActivity.RequestSpectrumPermission();
             _resumeAfterFocus = false;
         }
         catch { ReleaseFocus(); throw; }
@@ -118,6 +177,7 @@ internal sealed class AndroidAudioEngine : Java.Lang.Object, IAudioEngine, Audio
     {
         _preparation?.TrySetCanceled();
         _preparation = null;
+        ReleaseSpectrum();
         _player.Reset();
         _loaded = false;
         _resumeAfterFocus = false;

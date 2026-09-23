@@ -14,7 +14,7 @@ internal sealed partial class PlaybackSettingsViewModel(AudioOutputService audio
 
     [ObservableProperty]
     public partial IReadOnlyList<AudioOutputDevice> AvailableAudioDevices { get; private set; } =
-        [new(null, "Padrão do sistema")];
+        [new(null, Strings.Get("SystemOutput"))];
 
     [ObservableProperty]
     public partial AudioOutputDevice? SelectedAudioDevice { get; set; }
@@ -36,13 +36,13 @@ internal sealed partial class PlaybackSettingsViewModel(AudioOutputService audio
         try
         {
             _updatingDevices = true;
-            AvailableAudioDevices = [new(null, "Padrão do sistema"), .. audioOutput.GetDevices()];
-            AudioDeviceMessage = CanSelectAudioOutput ? audioOutput.StatusMessage
-                : "A seleção de saída é controlada pelo sistema nesta plataforma.";
+            AvailableAudioDevices = [new(null, Strings.Get("SystemOutput")), .. audioOutput.GetDevices()];
+            AudioDeviceMessage = CanSelectAudioOutput ? LocalizedOutputStatus
+                : Strings.Get("OutputManagedBySystem");
         }
         catch (Exception)
         {
-            AudioDeviceMessage = "Não foi possível listar as saídas de áudio. Tente atualizar novamente.";
+            AudioDeviceMessage = Strings.Get("OutputListFailed");
         }
         finally
         {
@@ -60,9 +60,9 @@ internal sealed partial class PlaybackSettingsViewModel(AudioOutputService audio
                 string.Equals(device.Id, AudioOutputDeviceId, StringComparison.Ordinal));
             if (selected is null)
             {
-                selected = new AudioOutputDevice(AudioOutputDeviceId, "Dispositivo salvo (indisponível)");
+                selected = new AudioOutputDevice(AudioOutputDeviceId, Strings.Get("UnavailableOutput"));
                 AvailableAudioDevices = [.. AvailableAudioDevices, selected];
-                AudioDeviceMessage = "O dispositivo salvo está indisponível. O player usará a saída padrão.";
+                AudioDeviceMessage = Strings.Get("OutputUnavailable");
             }
             SelectedAudioDevice = selected;
         }
@@ -75,8 +75,11 @@ internal sealed partial class PlaybackSettingsViewModel(AudioOutputService audio
     public void ApplyAudioOutput()
     {
         audioOutput.Apply(AudioOutputDeviceId);
-        AudioDeviceMessage = audioOutput.StatusMessage;
+        AudioDeviceMessage = LocalizedOutputStatus;
     }
+
+    private string? LocalizedOutputStatus => audioOutput.StatusMessage is null ? null
+        : Strings.Get(CanSelectAudioOutput ? "OutputRestoreFailed" : "OutputManagedBySystem");
 
     /// <summary>Null selects the system default audio output device.</summary>
     [ObservableProperty]

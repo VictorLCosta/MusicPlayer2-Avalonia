@@ -2,6 +2,9 @@ namespace MusicPlayer2_Avalonia.Application.Settings.Models;
 
 public sealed record AppSettings
 {
+    /// <summary>UI language: en, pt-BR, or zh-Hans. Null follows the system language.</summary>
+    public string? Language { get; init; }
+
     /// <summary>Null selects the system default audio output device.</summary>
     public string? AudioOutputDeviceId { get; init; }
 

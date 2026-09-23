@@ -167,8 +167,8 @@ public partial class MainView : UserControl
             {
                 var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
                 {
-                    Title = "Importar músicas para o aplicativo", AllowMultiple = true,
-                    FileTypeFilter = [new FilePickerFileType("Áudio")
+                    Title = Strings.Get("ImportTitle"), AllowMultiple = true,
+                    FileTypeFilter = [new FilePickerFileType(Strings.Get("Audio"))
                     {
                         MimeTypes = ["audio/*"], AppleUniformTypeIdentifiers = ["public.audio"],
                         Patterns = ["*.mp3", "*.m4a", "*.aac", "*.flac", "*.wav", "*.ogg", "*.opus", "*.aiff"]
@@ -192,14 +192,14 @@ public partial class MainView : UserControl
             else
             {
                 var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(
-                    new FolderPickerOpenOptions { Title = "Selecionar pasta de músicas", AllowMultiple = false });
+                    new FolderPickerOpenOptions { Title = Strings.Get("SelectMusicFolder"), AllowMultiple = false });
                 foreach (var folder in folders)
                     using (folder)
                         if (folder.TryGetLocalPath() is { } path) await vm.ImportFolderAsync(path);
-                        else vm.ReportImportError("Selecione uma pasta local.");
+                        else vm.ReportImportError(Strings.Get("SelectLocalFolder"));
             }
         }
-        catch (Exception ex) { vm.ReportImportError("Falha ao importar músicas: " + ex.Message); }
+        catch (Exception ex) { vm.ReportImportError(Strings.Get("ImportFailed") + ex.Message); }
         finally { vm.IsImporting = false; }
     }
 }

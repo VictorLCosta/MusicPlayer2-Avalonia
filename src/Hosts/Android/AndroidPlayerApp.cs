@@ -9,6 +9,7 @@ public sealed class AndroidPlayerApp : MusicPlayer2_Avalonia.App
     protected override void ConfigurePlatformServices(IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
+        
         services.AddSingleton<IAudioEngine, AndroidAudioEngine>();
     }
 }

@@ -1,0 +1,309 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <data name="General" xml:space="preserve">
+    <value>常规</value>
+  </data>
+  <data name="Playback" xml:space="preserve">
+    <value>播放</value>
+  </data>
+  <data name="MediaLibrary" xml:space="preserve">
+    <value>媒体库</value>
+  </data>
+  <data name="Appearance" xml:space="preserve">
+    <value>外观</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="SystemLanguage" xml:space="preserve">
+    <value>系统语言</value>
+  </data>
+  <data name="BackgroundPlayback" xml:space="preserve">
+    <value>音乐会在后台继续播放。点击播放器中的停止按钮可结束播放。</value>
+  </data>
+  <data name="AddFolder" xml:space="preserve">
+    <value>添加文件夹</value>
+  </data>
+  <data name="AddMusicFolder" xml:space="preserve">
+    <value>添加音乐文件夹</value>
+  </data>
+  <data name="AdjustVolume" xml:space="preserve">
+    <value>调节音量</value>
+  </data>
+  <data name="EqualizerHint" xml:space="preserve">
+    <value>播放时调整音效。关闭此对话框时会保存更改。</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>上一首</value>
+  </data>
+  <data name="CloseBehavior" xml:space="preserve">
+    <value>关闭窗口时</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>应用</value>
+  </data>
+  <data name="EnableEqualizer" xml:space="preserve">
+    <value>启用均衡器</value>
+  </data>
+  <data name="UpdateLibraryOnStartup" xml:space="preserve">
+    <value>启动时更新媒体库</value>
+  </data>
+  <data name="RefreshDevices" xml:space="preserve">
+    <value>刷新设备</value>
+  </data>
+  <data name="MusicLibrary" xml:space="preserve">
+    <value>音乐库</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="SettingsBusy" xml:space="preserve">
+    <value>正在加载或保存设置…</value>
+  </data>
+  <data name="LoadSettings" xml:space="preserve">
+    <value>加载设置</value>
+  </data>
+  <data name="Light" xml:space="preserve">
+    <value>浅色</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="ContinuePlayback" xml:space="preserve">
+    <value>切换播放列表时继续播放</value>
+  </data>
+  <data name="AccentColor" xml:space="preserve">
+    <value>强调色</value>
+  </data>
+  <data name="AccentHint" xml:space="preserve">
+    <value>留空以使用主题颜色。</value>
+  </data>
+  <data name="AudioOutput" xml:space="preserve">
+    <value>音频输出设备</value>
+  </data>
+  <data name="ExitApplication" xml:space="preserve">
+    <value>退出应用</value>
+  </data>
+  <data name="Equalizer" xml:space="preserve">
+    <value>均衡器</value>
+  </data>
+  <data name="Dark" xml:space="preserve">
+    <value>深色</value>
+  </data>
+  <data name="MissingFilesHint" xml:space="preserve">
+    <value>此选项不会删除磁盘上的文件。</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="CloseWithoutSaving" xml:space="preserve">
+    <value>不保存并关闭</value>
+  </data>
+  <data name="Importing" xml:space="preserve">
+    <value>正在导入音乐…</value>
+  </data>
+  <data name="ImportMusic" xml:space="preserve">
+    <value>导入音乐</value>
+  </data>
+  <data name="RememberPosition" xml:space="preserve">
+    <value>记住播放位置</value>
+  </data>
+  <data name="MaximizeRestore" xml:space="preserve">
+    <value>最大化或还原</value>
+  </data>
+  <data name="Minimize" xml:space="preserve">
+    <value>最小化</value>
+  </data>
+  <data name="MinimizeToTray" xml:space="preserve">
+    <value>最小化到托盘</value>
+  </data>
+  <data name="ShowAlbumCover" xml:space="preserve">
+    <value>显示专辑封面</value>
+  </data>
+  <data name="ToggleList" xml:space="preserve">
+    <value>显示或隐藏列表</value>
+  </data>
+  <data name="TogglePlaylist" xml:space="preserve">
+    <value>显示或隐藏播放列表</value>
+  </data>
+  <data name="NoTracks" xml:space="preserve">
+    <value>未找到音乐</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>停止</value>
+  </data>
+  <data name="MusicFolders" xml:space="preserve">
+    <value>音乐文件夹</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>搜索</value>
+  </data>
+  <data name="SearchMusic" xml:space="preserve">
+    <value>搜索音乐</value>
+  </data>
+  <data name="Playlist" xml:space="preserve">
+    <value>播放列表</value>
+  </data>
+  <data name="PlaybackPosition" xml:space="preserve">
+    <value>播放位置</value>
+  </data>
+  <data name="PreampShort" xml:space="preserve">
+    <value>前置增益</value>
+  </data>
+  <data name="Preamp" xml:space="preserve">
+    <value>前置放大</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>下一首</value>
+  </data>
+  <data name="PreampHint" xml:space="preserve">
+    <value>如果提升频段增益后出现失真，请降低前置增益。</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="RemoveMissingFiles" xml:space="preserve">
+    <value>移除不存在的文件记录</value>
+  </data>
+  <data name="TogglePlayback" xml:space="preserve">
+    <value>播放或暂停</value>
+  </data>
+  <data name="SettingsSection" xml:space="preserve">
+    <value>设置分类</value>
+  </data>
+  <data name="FollowSystem" xml:space="preserve">
+    <value>跟随系统</value>
+  </data>
+  <data name="NoArtwork" xml:space="preserve">
+    <value>无封面</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>主题</value>
+  </data>
+  <data name="ToggleTheme" xml:space="preserve">
+    <value>切换主题</value>
+  </data>
+  <data name="MobileImportHint" xml:space="preserve">
+    <value>使用播放器中的导入音乐来选择文件。副本保存在应用内，原文件不会更改。副本会占用存储空间，并在卸载应用时被删除。</value>
+  </data>
+  <data name="BackToPlayer" xml:space="preserve">
+    <value>返回播放器</value>
+  </data>
+  <data name="Volume" xml:space="preserve">
+    <value>音量</value>
+  </data>
+  <data name="ResetEqualizer" xml:space="preserve">
+    <value>重置调整</value>
+  </data>
+  <data name="NoTrackPlaying" xml:space="preserve">
+    <value>当前未播放音乐</value>
+  </data>
+  <data name="AllTracks" xml:space="preserve">
+    <value>全部音乐</value>
+  </data>
+  <data name="Folders" xml:space="preserve">
+    <value>文件夹</value>
+  </data>
+  <data name="TrackCount" xml:space="preserve">
+    <value>歌曲：{0}</value>
+  </data>
+  <data name="ImportTitle" xml:space="preserve">
+    <value>将音乐导入应用</value>
+  </data>
+  <data name="Audio" xml:space="preserve">
+    <value>音频</value>
+  </data>
+  <data name="SelectMusicFolder" xml:space="preserve">
+    <value>选择音乐文件夹</value>
+  </data>
+  <data name="SelectMusicFolders" xml:space="preserve">
+    <value>选择音乐文件夹</value>
+  </data>
+  <data name="SelectLocalFolder" xml:space="preserve">
+    <value>请选择本地文件夹。</value>
+  </data>
+  <data name="ImportFailed" xml:space="preserve">
+    <value>无法导入音乐：</value>
+  </data>
+  <data name="ThemeSaveFailed" xml:space="preserve">
+    <value>无法保存主题，请重试。</value>
+  </data>
+  <data name="SettingsLoadFailed" xml:space="preserve">
+    <value>无法加载设置，请重试。</value>
+  </data>
+  <data name="InvalidAccent" xml:space="preserve">
+    <value>请输入 #RRGGBB 格式的颜色，或将此字段留空。</value>
+  </data>
+  <data name="SettingsSaved" xml:space="preserve">
+    <value>设置已保存。</value>
+  </data>
+  <data name="OutputApplyFailed" xml:space="preserve">
+    <value>设置已保存，但无法切换音频输出。请再次尝试应用。</value>
+  </data>
+  <data name="SettingsSaveFailed" xml:space="preserve">
+    <value>无法保存设置。更改已保留，可再次尝试。</value>
+  </data>
+  <data name="ChangesDiscarded" xml:space="preserve">
+    <value>更改已放弃。</value>
+  </data>
+  <data name="PositionSaveFailed" xml:space="preserve">
+    <value>无法保存播放位置。</value>
+  </data>
+  <data name="Stereo" xml:space="preserve">
+    <value>立体声</value>
+  </data>
+  <data name="Mono" xml:space="preserve">
+    <value>单声道</value>
+  </data>
+  <data name="FolderPickerUnavailable" xml:space="preserve">
+    <value>此平台不支持选择文件夹。</value>
+  </data>
+  <data name="FolderOpenFailed" xml:space="preserve">
+    <value>无法打开文件夹，请重试。</value>
+  </data>
+  <data name="EqualizerApplyFailed" xml:space="preserve">
+    <value>无法应用均衡器，请重新调整。</value>
+  </data>
+  <data name="EqualizerSaveFailed" xml:space="preserve">
+    <value>调整已生效，但无法保存。请再次关闭以重试保存。</value>
+  </data>
+  <data name="SystemOutput" xml:space="preserve">
+    <value>系统默认</value>
+  </data>
+  <data name="OutputManagedBySystem" xml:space="preserve">
+    <value>此平台的音频输出由系统管理。</value>
+  </data>
+  <data name="OutputListFailed" xml:space="preserve">
+    <value>无法列出音频输出，请再次刷新。</value>
+  </data>
+  <data name="UnavailableOutput" xml:space="preserve">
+    <value>已保存的设备（不可用）</value>
+  </data>
+  <data name="OutputUnavailable" xml:space="preserve">
+    <value>已保存的设备不可用。播放器将使用默认输出。</value>
+  </data>
+  <data name="OutputRestoreFailed" xml:space="preserve">
+    <value>无法恢复已保存的输出。播放器将使用默认输出。</value>
+  </data>
+  <data name="EqualizerRestoreFailed" xml:space="preserve">
+    <value>无法恢复均衡器。请调整控件并关闭以重新保存。</value>
+  </data>
+  <data name="EnableDarkTheme">
+    <value>启用深色主题</value>
+  </data>
+  <data name="EnableLightTheme">
+    <value>启用浅色主题</value>
+  </data>
+  <data name="OpenPlayer">
+    <value>打开 MusicPlayer2</value>
+  </data>
+  <data name="Exit">
+    <value>退出</value>
+  </data>
+</root>

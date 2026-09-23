@@ -58,6 +58,7 @@ public partial class App : AvaloniaApplication
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        Strings.Apply(null);
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -138,6 +139,7 @@ public partial class App : AvaloniaApplication
     private void ApplyAppearance()
     {
         var settings = _settings?.Current ?? new AppSettings();
+        Strings.Apply(settings.Language);
         RequestedThemeVariant = settings.Theme switch
         {
             AppTheme.Light => ThemeVariant.Light,

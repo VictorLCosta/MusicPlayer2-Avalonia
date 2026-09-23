@@ -6,12 +6,12 @@
              x:DataType="vm:MediaLibrarySettingsViewModel">
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
     <StackPanel Classes="settings-form" Spacing="14" MaxWidth="560" HorizontalAlignment="Stretch">
-      <TextBlock Text="Biblioteca de mídia" FontSize="22" FontWeight="SemiBold" />
-      <TextBlock IsVisible="{x:Static app:App.IsMobile}" Text="Use Importar músicas no player para selecionar arquivos. Uma cópia fica no aplicativo; os originais não são alterados. As cópias ocupam espaço e são removidas ao desinstalar o aplicativo." TextWrapping="Wrap" />
+      <TextBlock Text="{DynamicResource Text.MediaLibrary}" FontSize="22" FontWeight="SemiBold" />
+      <TextBlock IsVisible="{x:Static app:App.IsMobile}" Text="{DynamicResource Text.MobileImportHint}" TextWrapping="Wrap" />
       <StackPanel Spacing="14" IsVisible="{x:Static app:App.IsDesktop}">
-      <TextBlock Text="Pastas de músicas" FontWeight="SemiBold" />
+      <TextBlock Text="{DynamicResource Text.MusicFolders}" FontWeight="SemiBold" />
       <ListBox x:Name="FoldersList" ItemsSource="{Binding LibraryFolders}" Height="160"
-               AutomationProperties.Name="Pastas de músicas">
+               AutomationProperties.Name="{DynamicResource Text.MusicFolders}">
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="x:String">
             <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding}" />
@@ -19,19 +19,19 @@
         </ListBox.ItemTemplate>
       </ListBox>
       <WrapPanel Classes="settings-folder-actions">
-        <Button Content="Adicionar pasta" Click="AddFolderClicked" />
-        <Button Content="Remover" Click="RemoveFolderClicked"
+        <Button Content="{DynamicResource Text.AddFolder}" Click="AddFolderClicked" />
+        <Button Content="{DynamicResource Text.Remove}" Click="RemoveFolderClicked"
                 IsEnabled="{Binding #FoldersList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}" />
       </WrapPanel>
       <TextBlock x:Name="FolderError" IsVisible="False" TextWrapping="Wrap"
                  Foreground="{DynamicResource Theme.Brush.Danger}" />
       <CheckBox IsChecked="{Binding UpdateLibraryOnStartup, Mode=TwoWay}">
-        <TextBlock Text="Atualizar a biblioteca ao iniciar" TextWrapping="Wrap" />
+        <TextBlock Text="{DynamicResource Text.UpdateLibraryOnStartup}" TextWrapping="Wrap" />
       </CheckBox>
       <CheckBox IsChecked="{Binding RemoveMissingFilesFromLibrary, Mode=TwoWay}">
-        <TextBlock Text="Remover referências a arquivos inexistentes" TextWrapping="Wrap" />
+        <TextBlock Text="{DynamicResource Text.RemoveMissingFiles}" TextWrapping="Wrap" />
       </CheckBox>
-      <TextBlock Text="Essa opção não exclui arquivos do disco." TextWrapping="Wrap"
+      <TextBlock Text="{DynamicResource Text.MissingFilesHint}" TextWrapping="Wrap"
                  Foreground="{DynamicResource Theme.Brush.TextMuted}" />
       </StackPanel>
     </StackPanel>

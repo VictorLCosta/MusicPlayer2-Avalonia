@@ -7,28 +7,28 @@
              x:DataType="vm:PlaybackSettingsViewModel">
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
     <StackPanel Classes="settings-form" Spacing="14" MaxWidth="560" HorizontalAlignment="Stretch">
-      <TextBlock Text="Reprodução" FontSize="22" FontWeight="SemiBold" />
-      <TextBlock Text="Dispositivo de saída de áudio" FontWeight="SemiBold" />
+      <TextBlock Text="{DynamicResource Text.Playback}" FontSize="22" FontWeight="SemiBold" />
+      <TextBlock Text="{DynamicResource Text.AudioOutput}" FontWeight="SemiBold" />
       <ComboBox ItemsSource="{Binding AvailableAudioDevices}"
                 SelectedItem="{Binding SelectedAudioDevice, Mode=TwoWay}"
                 IsEnabled="{Binding CanSelectAudioOutput}" HorizontalAlignment="Stretch"
-                AutomationProperties.Name="Dispositivo de saída de áudio">
+                AutomationProperties.Name="{DynamicResource Text.AudioOutput}">
         <ComboBox.ItemTemplate>
           <DataTemplate x:DataType="audio:AudioOutputDevice">
             <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
           </DataTemplate>
         </ComboBox.ItemTemplate>
       </ComboBox>
-      <Button Content="Atualizar dispositivos" Command="{Binding RefreshAudioDevicesCommand}"
+      <Button Content="{DynamicResource Text.RefreshDevices}" Command="{Binding RefreshAudioDevicesCommand}"
               IsEnabled="{Binding CanSelectAudioOutput}" />
       <TextBlock Text="{Binding AudioDeviceMessage}" TextWrapping="Wrap"
                  IsVisible="{Binding AudioDeviceMessage, Converter={x:Static ObjectConverters.IsNotNull}}"
                  Foreground="{DynamicResource Theme.Brush.TextMuted}" />
       <CheckBox IsChecked="{Binding RememberPlaybackPosition, Mode=TwoWay}">
-        <TextBlock Text="Lembrar a posição da reprodução" TextWrapping="Wrap" />
+        <TextBlock Text="{DynamicResource Text.RememberPosition}" TextWrapping="Wrap" />
       </CheckBox>
       <CheckBox IsChecked="{Binding ContinuePlaybackOnPlaylistChange, Mode=TwoWay}">
-        <TextBlock Text="Continuar tocando ao trocar de playlist" TextWrapping="Wrap" />
+        <TextBlock Text="{DynamicResource Text.ContinuePlayback}" TextWrapping="Wrap" />
       </CheckBox>
     </StackPanel>
   </ScrollViewer>

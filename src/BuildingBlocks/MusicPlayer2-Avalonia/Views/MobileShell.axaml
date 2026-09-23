@@ -3,6 +3,11 @@
              x:DataType="vm:MainWindowViewModel" TopLevel.AutoSafeAreaPadding="True"
              Background="{DynamicResource Theme.Brush.Background}">
   <Grid>
+    <Border ClipToBounds="True" IsHitTestVisible="False">
+      <Image Source="{Binding Main.Player.Artwork}" Stretch="UniformToFill" Margin="-32" Opacity="0.4">
+        <Image.Effect><BlurEffect Radius="32" /></Image.Effect>
+      </Image>
+    </Border>
     <TransitioningContentControl x:Name="PageContent" Content="{Binding CurrentPage}" />
     <Border x:Name="DialogOverlay" IsVisible="False" Background="{DynamicResource Theme.Brush.Background}">
       <ContentControl x:Name="DialogContent" />

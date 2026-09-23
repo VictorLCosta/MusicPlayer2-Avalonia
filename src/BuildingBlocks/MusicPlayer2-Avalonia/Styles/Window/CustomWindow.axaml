@@ -74,9 +74,9 @@
                               Spacing="4"
                               IsVisible="{TemplateBinding ShowWindowControls}"
                               Margin="12,0,0,0">
-                    <Button Name="PART_MinimizeButton" WindowDecorationProperties.ElementRole="MinimizeButton" Classes="window-control" Content="−" ToolTip.Tip="Minimizar" />
-                    <Button Name="PART_MaximizeButton" Classes="window-control" Content="□" ToolTip.Tip="Maximizar ou restaurar" />
-                    <Button Name="PART_CloseButton" WindowDecorationProperties.ElementRole="CloseButton" Classes="window-control close" Content="×" ToolTip.Tip="Fechar" />
+                    <Button Name="PART_MinimizeButton" WindowDecorationProperties.ElementRole="MinimizeButton" Classes="window-control" Content="−" ToolTip.Tip="{DynamicResource Text.Minimize}" />
+                    <Button Name="PART_MaximizeButton" Classes="window-control" Content="□" ToolTip.Tip="{DynamicResource Text.MaximizeRestore}" />
+                    <Button Name="PART_CloseButton" WindowDecorationProperties.ElementRole="CloseButton" Classes="window-control close" Content="×" ToolTip.Tip="{DynamicResource Text.Close}" />
                   </StackPanel>
                 </Grid>
               </Border>

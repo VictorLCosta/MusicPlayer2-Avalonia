@@ -6,15 +6,24 @@
              x:DataType="vm:GeneralSettingsViewModel">
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
     <StackPanel Classes="settings-form" Spacing="14" MaxWidth="560" HorizontalAlignment="Stretch">
-      <TextBlock Text="Geral" FontSize="22" FontWeight="SemiBold" />
-      <TextBlock IsVisible="{x:Static app:App.IsMobile}" Text="A reprodução continua em segundo plano. Use Parar no player para encerrá-la." TextWrapping="Wrap" />
+      <TextBlock Text="{DynamicResource Text.General}" FontSize="22" FontWeight="SemiBold" />
+      <TextBlock Text="{DynamicResource Text.Language}" FontWeight="SemiBold" />
+      <ComboBox HorizontalAlignment="Stretch" SelectedValue="{Binding Language, Mode=TwoWay}"
+                SelectedValueBinding="{ReflectionBinding Tag}"
+                AutomationProperties.Name="{DynamicResource Text.Language}">
+        <ComboBoxItem Content="{DynamicResource Text.SystemLanguage}" Tag="system" />
+        <ComboBoxItem Content="English" Tag="en" />
+        <ComboBoxItem Content="Português (Brasil)" Tag="pt-BR" />
+        <ComboBoxItem Content="简体中文" Tag="zh-Hans" />
+      </ComboBox>
+      <TextBlock IsVisible="{x:Static app:App.IsMobile}" Text="{DynamicResource Text.BackgroundPlayback}" TextWrapping="Wrap" />
       <StackPanel Spacing="14" IsVisible="{x:Static app:App.IsDesktop}">
-      <TextBlock Text="Ao fechar a janela" FontWeight="SemiBold" />
+      <TextBlock Text="{DynamicResource Text.CloseBehavior}" FontWeight="SemiBold" />
       <ComboBox HorizontalAlignment="Stretch"
                 SelectedValue="{Binding CloseBehavior, Mode=TwoWay}"
                 SelectedValueBinding="{ReflectionBinding Tag}">
-        <ComboBoxItem Content="Encerrar o aplicativo" Tag="{x:Static settings:WindowCloseBehavior.Exit}" />
-        <ComboBoxItem Content="Minimizar para a bandeja" Tag="{x:Static settings:WindowCloseBehavior.MinimizeToTray}" />
+        <ComboBoxItem Content="{DynamicResource Text.ExitApplication}" Tag="{x:Static settings:WindowCloseBehavior.Exit}" />
+        <ComboBoxItem Content="{DynamicResource Text.MinimizeToTray}" Tag="{x:Static settings:WindowCloseBehavior.MinimizeToTray}" />
       </ComboBox>
       </StackPanel>
     </StackPanel>

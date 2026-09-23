@@ -12,6 +12,10 @@
     <!-- Keep debug APKs installable without an IDE's fast-deployment payload. -->
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <!-- Preserve Avalonia XAML metadata and reflection-based persistence/tag readers.
+         Android AOT requires trimming, so keep both disabled until trim safety is validated. -->
+    <PublishTrimmed>false</PublishTrimmed>
+    <RunAOTCompilation>false</RunAOTCompilation>
     <HotAvaloniaAutoEnable>false</HotAvaloniaAutoEnable>
   </PropertyGroup>
 

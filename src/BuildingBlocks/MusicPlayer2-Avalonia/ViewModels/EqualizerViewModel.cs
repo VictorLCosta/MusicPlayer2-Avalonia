@@ -27,7 +27,7 @@ internal sealed partial class EqualizerViewModel(EqualizerService service) : Vie
         foreach (var band in Bands) band.PropertyChanged += BandChanged;
         IsEnabled = saved.Enabled;
         Preamp = saved.Preamp;
-        ErrorMessage = service.LoadError;
+        ErrorMessage = service.LoadError is null ? null : Strings.Get("EqualizerRestoreFailed");
         _updating = false;
     }
 
@@ -49,7 +49,7 @@ internal sealed partial class EqualizerViewModel(EqualizerService service) : Vie
         }
         catch (Exception)
         {
-            ErrorMessage = "Não foi possível aplicar o equalizador. Tente ajustar novamente.";
+            ErrorMessage = Strings.Get("EqualizerApplyFailed");
             return false;
         }
     }
@@ -75,7 +75,7 @@ internal sealed partial class EqualizerViewModel(EqualizerService service) : Vie
         }
         catch (Exception)
         {
-            ErrorMessage = "O ajuste está ativo, mas não foi possível salvá-lo. Feche novamente para tentar salvar.";
+            ErrorMessage = Strings.Get("EqualizerSaveFailed");
             return false;
         }
         finally { IsSaving = false; }

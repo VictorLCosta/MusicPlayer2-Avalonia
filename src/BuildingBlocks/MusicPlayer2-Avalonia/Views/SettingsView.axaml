@@ -18,7 +18,7 @@
         <ComboBox Classes="settings-mobile-menu" HorizontalAlignment="Stretch"
                   ItemsSource="{Binding SettingsMenuItems}"
                   SelectedItem="{Binding SelectedMenuItem, Mode=TwoWay}"
-                  AutomationProperties.Name="Seção de configurações">
+                  AutomationProperties.Name="{DynamicResource Text.SettingsSection}">
           <ComboBox.ItemTemplate>
             <DataTemplate x:DataType="models:MenuItem">
               <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
@@ -48,7 +48,7 @@
             BorderThickness="0,1,0,0">
       <StackPanel Spacing="8" 
                   Margin="12">
-        <TextBlock Text="Carregando ou salvando configurações…" TextWrapping="Wrap" IsVisible="{Binding IsBusy}" />
+        <TextBlock Text="{DynamicResource Text.SettingsBusy}" TextWrapping="Wrap" IsVisible="{Binding IsBusy}" />
         <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"
                    IsVisible="{Binding ErrorMessage, Converter={x:Static ObjectConverters.IsNotNull}}"
                    Foreground="{DynamicResource Theme.Brush.Danger}" />
@@ -56,19 +56,19 @@
                  IsVisible="{Binding StatusMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
                  
         <WrapPanel Classes="settings-actions">
-          <Button Content="Voltar ao player" Click="BackToPlayerClicked" />
-          <Button Content="Carregar configurações" Command="{Binding LoadSettingsCommand}"
+          <Button Content="{DynamicResource Text.BackToPlayer}" Click="BackToPlayerClicked" />
+          <Button Content="{DynamicResource Text.LoadSettings}" Command="{Binding LoadSettingsCommand}"
                   IsVisible="{Binding !IsLoaded}" />
           <Button Command="{Binding CancelSettingsCommand}">
             <StackPanel Orientation="Horizontal" Spacing="8">
               <LucideIcon Kind="CircleX" />
-              <TextBlock Text="Cancelar" VerticalAlignment="Center" />
+              <TextBlock Text="{DynamicResource Text.Cancel}" VerticalAlignment="Center" />
             </StackPanel>
           </Button>
           <Button Command="{Binding SaveSettingsCommand}">
             <StackPanel Orientation="Horizontal" Spacing="8">
               <LucideIcon Kind="SaveCheck" />
-              <TextBlock Text="Aplicar" VerticalAlignment="Center" />
+              <TextBlock Text="{DynamicResource Text.Apply}" VerticalAlignment="Center" />
             </StackPanel>
           </Button>
         </WrapPanel>

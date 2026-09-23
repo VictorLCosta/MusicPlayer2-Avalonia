@@ -6,22 +6,22 @@
              x:DataType="vm:AppearanceSettingsViewModel">
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
     <StackPanel Classes="settings-form" Spacing="14" MaxWidth="560" HorizontalAlignment="Stretch">
-      <TextBlock Text="Aparência" FontSize="22" FontWeight="SemiBold" />
-      <TextBlock Text="Tema" FontWeight="SemiBold" />
+      <TextBlock Text="{DynamicResource Text.Appearance}" FontSize="22" FontWeight="SemiBold" />
+      <TextBlock Text="{DynamicResource Text.Theme}" FontWeight="SemiBold" />
       <ComboBox HorizontalAlignment="Stretch"
                 SelectedValue="{Binding Theme, Mode=TwoWay}"
                 SelectedValueBinding="{ReflectionBinding Tag}">
-        <ComboBoxItem Content="Seguir o sistema" Tag="{x:Static settings:AppTheme.System}" />
-        <ComboBoxItem Content="Claro" Tag="{x:Static settings:AppTheme.Light}" />
-        <ComboBoxItem Content="Escuro" Tag="{x:Static settings:AppTheme.Dark}" />
+        <ComboBoxItem Content="{DynamicResource Text.FollowSystem}" Tag="{x:Static settings:AppTheme.System}" />
+        <ComboBoxItem Content="{DynamicResource Text.Light}" Tag="{x:Static settings:AppTheme.Light}" />
+        <ComboBoxItem Content="{DynamicResource Text.Dark}" Tag="{x:Static settings:AppTheme.Dark}" />
       </ComboBox>
-      <TextBlock Text="Cor de destaque" FontWeight="SemiBold" />
+      <TextBlock Text="{DynamicResource Text.AccentColor}" FontWeight="SemiBold" />
       <TextBox Text="{Binding AccentColor, Mode=TwoWay}" PlaceholderText="#RRGGBB"
-               AutomationProperties.Name="Cor de destaque" />
-      <TextBlock Text="Deixe em branco para usar a cor do tema." TextWrapping="Wrap"
+               AutomationProperties.Name="{DynamicResource Text.AccentColor}" />
+      <TextBlock Text="{DynamicResource Text.AccentHint}" TextWrapping="Wrap"
                  Foreground="{DynamicResource Theme.Brush.TextMuted}" />
       <CheckBox IsChecked="{Binding ShowAlbumCover, Mode=TwoWay}" >
-        <TextBlock Text="Mostrar capa do álbum" TextWrapping="Wrap" />
+        <TextBlock Text="{DynamicResource Text.ShowAlbumCover}" TextWrapping="Wrap" />
       </CheckBox>
     </StackPanel>
   </ScrollViewer>

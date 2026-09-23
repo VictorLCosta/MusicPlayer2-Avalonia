@@ -24,13 +24,13 @@ public partial class MediaLibrarySettingsView : UserControl
         {
             if (!topLevel.StorageProvider.CanPickFolder)
             {
-                FolderError.Text = "A seleção de pastas não está disponível nesta plataforma.";
+                FolderError.Text = Strings.Get("FolderPickerUnavailable");
                 FolderError.IsVisible = true;
                 return;
             }
 
             var folders = await topLevel.StorageProvider.OpenFolderPickerAsync(
-                new FolderPickerOpenOptions { Title = "Selecionar pastas de músicas", AllowMultiple = true });
+                new FolderPickerOpenOptions { Title = Strings.Get("SelectMusicFolders"), AllowMultiple = true });
             foreach (var folder in folders)
             {
                 using (folder)
@@ -38,7 +38,7 @@ public partial class MediaLibrarySettingsView : UserControl
                     var path = folder.TryGetLocalPath();
                     if (path is null)
                     {
-                        FolderError.Text = "Selecione uma pasta local para adicionar à biblioteca.";
+                        FolderError.Text = Strings.Get("SelectLocalFolder");
                         FolderError.IsVisible = true;
                         continue;
                     }
@@ -52,7 +52,7 @@ public partial class MediaLibrarySettingsView : UserControl
         }
         catch (Exception)
         {
-            FolderError.Text = "Não foi possível abrir a pasta. Tente novamente.";
+            FolderError.Text = Strings.Get("FolderOpenFailed");
             FolderError.IsVisible = true;
         }
     }

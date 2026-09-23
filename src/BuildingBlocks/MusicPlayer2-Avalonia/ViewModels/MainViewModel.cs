@@ -55,15 +55,25 @@ internal sealed partial class MainViewModel : ViewModelBase
 
     public ObservableCollection<LibraryNode> LibraryNodes { get; } =
     [
-        new() { Name = "Todas as músicas", Kind = LibraryNodeKind.AllTracks },
-        new() { Name = "Pastas", Kind = LibraryNodeKind.Group }
+        new() { Name = Strings.Get("AllTracks"), Kind = LibraryNodeKind.AllTracks },
+        new() { Name = Strings.Get("Folders"), Kind = LibraryNodeKind.Group }
     ];
 
     [ObservableProperty]
     public partial LibraryNode? SelectedNode { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TrackCountText))]
     public partial int TrackCount { get; private set; }
+
+    public string TrackCountText => Strings.Format("TrackCount", TrackCount);
+
+    private void LanguageChanged(object? sender, EventArgs e)
+    {
+        LibraryNodes[0].Name = Strings.Get("AllTracks");
+        LibraryNodes[1].Name = Strings.Get("Folders");
+        OnPropertyChanged(nameof(TrackCountText));
+    }
 
     [ObservableProperty]
     public partial TimeSpan TotalDuration { get; private set; }
@@ -80,6 +90,7 @@ internal sealed partial class MainViewModel : ViewModelBase
         _settings = settings;
         _maintenance = maintenance;
         _settings.Changed += SettingsChanged;
+        Strings.Changed += LanguageChanged;
 
         SelectedNode = LibraryNodes[0];
 
@@ -236,6 +247,7 @@ internal sealed partial class MainViewModel : ViewModelBase
     public override void Dispose()
     {
         _settings.Changed -= SettingsChanged;
+        Strings.Changed -= LanguageChanged;
         base.Dispose();
 
         _tracksSubscription.Dispose();

@@ -20,14 +20,30 @@
           </StackPanel>
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
             <Button Classes="chrome-button" Click="ImportFolderClicked"
-                    ToolTip.Tip="Adicionar pasta de músicas"><lucide:LucideIcon Kind="FolderPlus" Size="18" /></Button>
+                    ToolTip.Tip="{DynamicResource Text.AddMusicFolder}"><lucide:LucideIcon Kind="FolderPlus" Size="18" /></Button>
             <Button x:Name="PlaylistToggleButton" Classes="chrome-button"
-                    Click="TogglePlaylist" ToolTip.Tip="Mostrar ou ocultar lista"><lucide:LucideIcon Kind="ListMusic" Size="18" /></Button>
+                    Click="TogglePlaylist" ToolTip.Tip="{DynamicResource Text.ToggleList}"><lucide:LucideIcon Kind="ListMusic" Size="18" /></Button>
           </StackPanel>
         </Grid>
       </Border>
 
-      <Grid Grid.Row="1" x:Name="ContentGrid" ColumnDefinitions="*,*" MinHeight="0">
+      <Grid Grid.Row="0" Classes="player-mobile" ColumnDefinitions="*,Auto"
+            Background="#60000000">
+        <TextBlock Text="MusicPlayer2" Margin="12,0,8,0"
+                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                   Foreground="{DynamicResource Theme.Brush.TextMuted}" FontSize="12" />
+        <StackPanel Grid.Column="1" Orientation="Horizontal">
+        <Button Classes="transport-button" Click="OpenSettings" ToolTip.Tip="{DynamicResource Text.Settings}"
+                AutomationProperties.Name="{DynamicResource Text.Settings}"><lucide:LucideIcon Kind="Settings" Size="18" /></Button>
+        <Button Classes="transport-button" Click="ImportFolderClicked" ToolTip.Tip="{DynamicResource Text.ImportMusic}" AutomationProperties.Name="{DynamicResource Text.ImportMusic}"><lucide:LucideIcon Kind="FolderPlus" Size="18" /></Button>
+        <Button x:Name="MobileEqualizerButton" Classes="transport-button" Click="OpenEqualizer" ToolTip.Tip="{DynamicResource Text.Equalizer}"
+                IsEnabled="False" AutomationProperties.Name="{DynamicResource Text.Equalizer}">
+          <lucide:LucideIcon Kind="SlidersVertical" Size="18" />
+        </Button>
+        </StackPanel>
+      </Grid>
+
+      <Grid Grid.Row="1" x:Name="ContentGrid" ColumnDefinitions="*,*" MinHeight="0" ClipToBounds="True">
         <nowPlaying:NowPlaying Grid.Column="0" x:Name="PlayerPanel"
                                CurrentTrack="{Binding Player.CurrentTrack}"
                                Artwork="{Binding Player.Artwork}"
@@ -41,17 +57,17 @@
             <Grid ColumnDefinitions="Auto,*,Auto" Height="32" ColumnSpacing="8">
             <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
               <lucide:LucideIcon Kind="ListMusic" Size="18" />
-              <TextBlock Text="Playlist" VerticalAlignment="Center" />
+              <TextBlock Text="{DynamicResource Text.Playlist}" VerticalAlignment="Center" />
             </StackPanel>
             <Border Grid.Column="1" Background="{DynamicResource Theme.Brush.Input}" CornerRadius="3" Padding="8,4">
-              <TextBlock Text="Biblioteca de músicas" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+              <TextBlock Text="{DynamicResource Text.MusicLibrary}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
             </Border>
-            <Button Grid.Column="2" Classes="chrome-button" Click="ImportFolderClicked" ToolTip.Tip="Adicionar pasta">
+            <Button Grid.Column="2" Classes="chrome-button" Click="ImportFolderClicked" ToolTip.Tip="{DynamicResource Text.AddFolder}">
               <lucide:LucideIcon Kind="FolderPlus" Size="18" />
             </Button>
           </Grid>
 
-            <TextBox Grid.Row="1" Height="30" MinHeight="30" Padding="6,3" Text="{Binding SearchText, Mode=TwoWay}" PlaceholderText="Pesquisar músicas">
+            <TextBox Grid.Row="1" Height="30" MinHeight="30" Padding="6,3" Text="{Binding SearchText, Mode=TwoWay}" PlaceholderText="{DynamicResource Text.SearchMusic}">
               <TextBox.InnerRightContent>
                 <LucideIcon Kind="Search" Size="14" Margin="2" />
               </TextBox.InnerRightContent>
@@ -61,8 +77,8 @@
 
             <StackPanel IsVisible="{Binding !HasTracks}" VerticalAlignment="Center"
                         HorizontalAlignment="Center" Spacing="8">
-              <TextBlock Text="Nenhuma música encontrada" TextAlignment="Center" />
-              <Button Content="Adicionar pasta de músicas" Click="ImportFolderClicked" />
+              <TextBlock Text="{DynamicResource Text.NoTracks}" TextAlignment="Center" />
+              <Button Content="{DynamicResource Text.AddMusicFolder}" Click="ImportFolderClicked" />
             </StackPanel>
 
             <ListBox x:Name="TrackList" Classes="playlist" IsVisible="{Binding HasTracks}" ItemsSource="{Binding FilteredTracks}"
@@ -100,33 +116,33 @@
             CornerRadius="5" Padding="3,0" Height="30">
       <Grid ColumnDefinitions="* Auto">
         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="0">
-          <Button Classes="chrome-button" Click="OpenSettings" ToolTip.Tip="Configurações">
+          <Button Classes="chrome-button" Click="OpenSettings" ToolTip.Tip="{DynamicResource Text.Settings}">
             <LucideIcon Kind="Settings" Size="16" />
           </Button>
-          <Button x:Name="EqualizerButton" Classes="chrome-button" Click="OpenEqualizer" ToolTip.Tip="Equalizador"
-                  IsEnabled="False" AutomationProperties.Name="Equalizador">
+          <Button x:Name="EqualizerButton" Classes="chrome-button" Click="OpenEqualizer" ToolTip.Tip="{DynamicResource Text.Equalizer}"
+                  IsEnabled="False" AutomationProperties.Name="{DynamicResource Text.Equalizer}">
             <LucideIcon Kind="SlidersVertical" Size="16" />
           </Button>
-          <Button Classes="chrome-button" Click="ImportFolderClicked" ToolTip.Tip="Adicionar pasta">
+          <Button Classes="chrome-button" Click="ImportFolderClicked" ToolTip.Tip="{DynamicResource Text.AddFolder}">
             <LucideIcon Kind="FolderPlus" Size="16" />
           </Button>
-          <Button Classes="chrome-button" Click="FocusSearch" ToolTip.Tip="Pesquisar">
+          <Button Classes="chrome-button" Click="FocusSearch" ToolTip.Tip="{DynamicResource Text.Search}">
             <LucideIcon Kind="Search" Size="16" />
           </Button>
-          <Button Classes="chrome-button" Click="TogglePlaylist" ToolTip.Tip="Mostrar ou ocultar playlist">
+          <Button Classes="chrome-button" Click="TogglePlaylist" ToolTip.Tip="{DynamicResource Text.TogglePlaylist}">
             <LucideIcon Kind="ListMusic" Size="16" />
           </Button>
-          <TextBlock Text="{Binding TrackCount, StringFormat='{}{0} músicas'}"
+          <TextBlock Text="{Binding TrackCountText}"
                     Margin="8,0,0,0" FontSize="12" Foreground="{DynamicResource Theme.Brush.Text}" VerticalAlignment="Center" />
         </StackPanel>
 
         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
           <!-- Controle de Volume -->
-          <Button Classes="chrome-button" ToolTip.Tip="Ajustar volume">
+          <Button Classes="chrome-button" ToolTip.Tip="{DynamicResource Text.AdjustVolume}">
             <Button.Flyout>
               <Flyout Placement="Top">
                 <StackPanel Spacing="6" Margin="8,4">
-                  <TextBlock Text="Volume" />
+                  <TextBlock Text="{DynamicResource Text.Volume}" />
                   <Slider Minimum="0" Maximum="100" Width="160"
                           Value="{Binding Player.VolumePercent, Mode=TwoWay}" />
                 </StackPanel>
@@ -144,19 +160,19 @@
 
       <Grid Grid.Row="3" Classes="player-desktop" ColumnDefinitions="Auto * Auto Auto" ColumnSpacing="6" Margin="4,7,6,4">
         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="3">
-          <Button Classes="transport-button" Command="{Binding Player.StopCommand}" ToolTip.Tip="Parar">
+          <Button Classes="transport-button" Command="{Binding Player.StopCommand}" ToolTip.Tip="{DynamicResource Text.Stop}">
             <lucide:LucideIcon Kind="Square" Size="17" />
           </Button>
-          <Button Classes="transport-button" Command="{Binding Player.PreviousCommand}" ToolTip.Tip="Anterior">
+          <Button Classes="transport-button" Command="{Binding Player.PreviousCommand}" ToolTip.Tip="{DynamicResource Text.Previous}">
             <lucide:LucideIcon Kind="SkipBack" Size="19" />
           </Button>
-          <Button Classes="transport-button" Command="{Binding Player.TogglePlaybackCommand}" ToolTip.Tip="Reproduzir ou pausar">
+          <Button Classes="transport-button" Command="{Binding Player.TogglePlaybackCommand}" ToolTip.Tip="{DynamicResource Text.TogglePlayback}">
             <Grid>
               <lucide:LucideIcon Kind="Play" Size="19" IsVisible="{Binding !Player.IsPlaying}" />
               <lucide:LucideIcon Kind="Pause" Size="19" IsVisible="{Binding Player.IsPlaying}" />
             </Grid>
           </Button>
-          <Button Classes="transport-button" Command="{Binding Player.NextCommand}" ToolTip.Tip="Próxima">
+          <Button Classes="transport-button" Command="{Binding Player.NextCommand}" ToolTip.Tip="{DynamicResource Text.Next}">
             <lucide:LucideIcon Kind="SkipForward" Size="19" />
           </Button>
         </StackPanel>
@@ -172,47 +188,44 @@
             </MultiBinding>
           </TextBlock.Text>
         </TextBlock>
-        <Button Grid.Column="3" Classes="chrome-button" Click="TogglePlaylist" ToolTip.Tip="Mostrar ou ocultar playlist">
+        <Button Grid.Column="3" Classes="chrome-button" Click="TogglePlaylist" ToolTip.Tip="{DynamicResource Text.TogglePlaylist}">
           <lucide:LucideIcon Kind="ListMusic" Size="18" />
         </Button>
     </Grid>
     
-      <Grid Grid.Row="3" Classes="player-mobile" RowDefinitions="Auto,Auto,Auto,Auto"
-          Background="{DynamicResource Theme.Brush.Toolbar}">
+      <Grid Grid.Row="3" Classes="player-mobile" RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+          Background="#60000000">
         <Slider x:Name="MobileTimeSlider" Classes="time-slider" Margin="12,0"
                 Minimum="0" Maximum="{Binding Player.DurationSeconds}"
                 Value="{Binding Player.PositionSeconds, Mode=TwoWay}"
-                AutomationProperties.Name="Posição da reprodução" />
-      <WrapPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-        <Button Classes="transport-button" Command="{Binding Player.StopCommand}" ToolTip.Tip="Parar"
-                AutomationProperties.Name="Parar"><lucide:LucideIcon Kind="Square" Size="18" /></Button>
-        <Button Classes="transport-button" Command="{Binding Player.PreviousCommand}" ToolTip.Tip="Anterior"
-                AutomationProperties.Name="Anterior"><lucide:LucideIcon Kind="SkipBack" Size="20" /></Button>
-        <Button Classes="transport-button" Command="{Binding Player.TogglePlaybackCommand}" ToolTip.Tip="Reproduzir ou pausar"
-                AutomationProperties.Name="Reproduzir ou pausar">
+                AutomationProperties.Name="{DynamicResource Text.PlaybackPosition}" />
+      <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="16,0" IsHitTestVisible="False">
+        <TextBlock Text="{Binding Player.PositionText}" FontSize="11" />
+        <TextBlock Grid.Column="1" Text="{Binding Player.DurationText}" FontSize="11" />
+      </Grid>
+      <WrapPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+        <Button Classes="transport-button" Command="{Binding Player.StopCommand}" ToolTip.Tip="{DynamicResource Text.Stop}"
+                AutomationProperties.Name="{DynamicResource Text.Stop}"><lucide:LucideIcon Kind="Square" Size="18" /></Button>
+        <Button Classes="transport-button" Command="{Binding Player.PreviousCommand}" ToolTip.Tip="{DynamicResource Text.Previous}"
+                AutomationProperties.Name="{DynamicResource Text.Previous}"><lucide:LucideIcon Kind="SkipBack" Size="20" /></Button>
+        <Button Classes="transport-button" Command="{Binding Player.TogglePlaybackCommand}" ToolTip.Tip="{DynamicResource Text.TogglePlayback}"
+                AutomationProperties.Name="{DynamicResource Text.TogglePlayback}">
           <Grid>
             <lucide:LucideIcon Kind="Play" Size="20" IsVisible="{Binding !Player.IsPlaying}" />
             <lucide:LucideIcon Kind="Pause" Size="20" IsVisible="{Binding Player.IsPlaying}" />
           </Grid>
         </Button>
-        <Button Classes="transport-button" Command="{Binding Player.NextCommand}" ToolTip.Tip="Próxima"
-                AutomationProperties.Name="Próxima"><lucide:LucideIcon Kind="SkipForward" Size="20" /></Button>
-        <Button Classes="transport-button" Click="OpenSettings" ToolTip.Tip="Configurações"
-                AutomationProperties.Name="Configurações"><lucide:LucideIcon Kind="Settings" Size="18" /></Button>
-        <Button Classes="transport-button" Click="ImportFolderClicked" ToolTip.Tip="Importar músicas" AutomationProperties.Name="Importar músicas"><lucide:LucideIcon Kind="FolderPlus" Size="18" /></Button>
-        <Button x:Name="MobileEqualizerButton" Classes="transport-button" Click="OpenEqualizer" ToolTip.Tip="Equalizador"
-                IsEnabled="False" AutomationProperties.Name="Equalizador">
-          <lucide:LucideIcon Kind="SlidersVertical" Size="18" />
-        </Button>
-        <Button Classes="transport-button" Click="TogglePlaylist" ToolTip.Tip="Mostrar ou ocultar playlist"
-                AutomationProperties.Name="Mostrar ou ocultar playlist"><lucide:LucideIcon Kind="ListMusic" Size="20" /></Button>
+        <Button Classes="transport-button" Command="{Binding Player.NextCommand}" ToolTip.Tip="{DynamicResource Text.Next}"
+                AutomationProperties.Name="{DynamicResource Text.Next}"><lucide:LucideIcon Kind="SkipForward" Size="20" /></Button>
+        <Button Classes="transport-button" Click="TogglePlaylist" ToolTip.Tip="{DynamicResource Text.TogglePlaylist}"
+                AutomationProperties.Name="{DynamicResource Text.TogglePlaylist}"><lucide:LucideIcon Kind="ListMusic" Size="20" /></Button>
       </WrapPanel>
-      <StackPanel Grid.Row="2" Margin="12,0">
-        <TextBlock Text="Importando músicas…" IsVisible="{Binding IsImporting}" />
+      <StackPanel Grid.Row="4" Margin="12,0">
+        <TextBlock Text="{DynamicResource Text.Importing}" IsVisible="{Binding IsImporting}" />
         <TextBlock Text="{Binding LibraryError}" TextWrapping="Wrap" MaxHeight="80"
                    Foreground="{DynamicResource Theme.Brush.Danger}" />
       </StackPanel>
-      <spectrum:AudioSpectrum Grid.Row="3" Height="32" Margin="16,0"
+      <spectrum:AudioSpectrum Grid.Row="3" Height="44" Margin="16,0,16,4" BarBrush="{DynamicResource Theme.Brush.Text}"
                               IsVisible="{Binding Player.SpectrumSource, Converter={x:Static ObjectConverters.IsNotNull}}"
                               Source="{Binding Player.SpectrumSource}" />
     </Grid>

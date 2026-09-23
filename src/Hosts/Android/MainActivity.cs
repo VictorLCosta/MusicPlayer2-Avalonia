@@ -13,12 +13,23 @@ namespace MusicPlayer2.Avalonia.Android;
     ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
 public class MainActivity : AvaloniaMainActivity
 {
+    private static WeakReference<MainActivity>? _current;
+    private bool _spectrumPermissionRequested;
+
+    internal static void RequestSpectrumPermission()
+    {
+        if (_current is null || !_current.TryGetTarget(out var activity) || activity._spectrumPermissionRequested ||
+            activity.CheckSelfPermission(global::Android.Manifest.Permission.RecordAudio) == Permission.Granted) return;
+        activity._spectrumPermissionRequested = true;
+        activity.RequestPermissions([global::Android.Manifest.Permission.RecordAudio], 410);
+    }
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2213", Justification = "Android activity callback is unregistered and disposed in OnDestroy.")]
     private BackCallback? _back;
 
     protected override void OnCreate(global::Android.OS.Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
+        _current = new WeakReference<MainActivity>(this);
         if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
             _back = new BackCallback(this);

@@ -6,10 +6,10 @@
         x:DataType="vm:EqualizerViewModel">
   <Grid Margin="24" RowDefinitions="Auto,*,Auto" RowSpacing="18" IsEnabled="{Binding !IsSaving}">
     <StackPanel Spacing="6">
-      <TextBlock Text="Equalizador" FontSize="24" FontWeight="SemiBold" />
-      <TextBlock Text="Ajuste o som durante a reprodução. As alterações são salvas ao fechar."
+      <TextBlock Text="{DynamicResource Text.Equalizer}" FontSize="24" FontWeight="SemiBold" />
+      <TextBlock Text="{DynamicResource Text.EqualizerHint}"
                  TextWrapping="Wrap" />
-      <ToggleSwitch Content="Ativar equalizador" IsChecked="{Binding IsEnabled, Mode=TwoWay}" Margin="0,8,0,0" />
+      <ToggleSwitch Content="{DynamicResource Text.EnableEqualizer}" IsChecked="{Binding IsEnabled, Mode=TwoWay}" Margin="0,8,0,0" />
     </StackPanel>
     <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
       <Grid ColumnDefinitions="Auto,*" ColumnSpacing="20" IsEnabled="{Binding IsEnabled}">
@@ -17,21 +17,21 @@
           <TextBlock Text="{Binding Preamp, StringFormat='{}{0:+0;-0;0} dB'}" HorizontalAlignment="Center" />
           <Slider Orientation="Vertical" Height="165" Minimum="-12" Maximum="12" TickFrequency="1"
                   IsSnapToTickEnabled="True" Value="{Binding Preamp, Mode=TwoWay}"
-                  HorizontalAlignment="Center" AutomationProperties.Name="Pré-amplificação" />
-          <TextBlock Text="Pré-amplif." HorizontalAlignment="Center" />
+                  HorizontalAlignment="Center" AutomationProperties.Name="{DynamicResource Text.Preamp}" />
+          <TextBlock Text="{DynamicResource Text.PreampShort}" HorizontalAlignment="Center" />
         </StackPanel>
         <eq:Equalizer Grid.Column="1" Bands="{Binding Bands}" />
       </Grid>
     </ScrollViewer>
     <StackPanel Grid.Row="2" Spacing="10">
-      <TextBlock Text="Reduza a pré-amplificação se o som distorcer ao aumentar as bandas." TextWrapping="Wrap" FontSize="12" />
+      <TextBlock Text="{DynamicResource Text.PreampHint}" TextWrapping="Wrap" FontSize="12" />
       <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" Foreground="{DynamicResource Theme.Brush.Danger}"
                  IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
       <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-        <Button Content="Zerar ajustes" Command="{Binding ResetCommand}" HorizontalAlignment="Left" />
-        <Button Grid.Column="1" Content="Fechar sem salvar" Click="CloseWithoutSaving"
+        <Button Content="{DynamicResource Text.ResetEqualizer}" Command="{Binding ResetCommand}" HorizontalAlignment="Left" />
+        <Button Grid.Column="1" Content="{DynamicResource Text.CloseWithoutSaving}" Click="CloseWithoutSaving"
                 IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-        <Button Grid.Column="2" Content="Fechar" Click="CloseClicked" />
+        <Button Grid.Column="2" Content="{DynamicResource Text.Close}" Click="CloseClicked" />
       </Grid>
     </StackPanel>
   </Grid>

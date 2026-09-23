@@ -23,8 +23,19 @@ public partial class MainWindow : CustomWindow
     public MainWindow()
     {
         InitializeComponent();
+        Strings.Changed += LanguageChanged;
         ActualThemeVariantChanged += (_, _) => UpdateThemeIcon();
         UpdateThemeIcon();
+    }
+
+    private void LanguageChanged(object? sender, EventArgs e)
+    {
+        UpdateThemeIcon();
+        if (_trayIcon?.Menu is { } menu)
+        {
+            if (menu.Items[0] is NativeMenuItem show) show.Header = Strings.Get("OpenPlayer");
+            if (menu.Items[2] is NativeMenuItem exit) exit.Header = Strings.Get("Exit");
+        }
     }
 
     private void UpdateThemeIcon()
@@ -32,7 +43,7 @@ public partial class MainWindow : CustomWindow
         var isLight = ActualThemeVariant == ThemeVariant.Light;
         LightThemeIcon.IsVisible = !isLight;
         DarkThemeIcon.IsVisible = isLight;
-        var label = isLight ? "Ativar tema escuro" : "Ativar tema claro";
+        var label = Strings.Get(isLight ? "EnableDarkTheme" : "EnableLightTheme");
         ToolTip.SetTip(ThemeToggleButton, label);
         Avalonia.Automation.AutomationProperties.SetName(ThemeToggleButton, label);
     }
@@ -55,7 +66,7 @@ public partial class MainWindow : CustomWindow
         }
         catch (Exception)
         {
-            ToolTip.SetTip(ThemeToggleButton, "Não foi possível salvar o tema. Tente novamente.");
+            ToolTip.SetTip(ThemeToggleButton, Strings.Get("ThemeSaveFailed"));
         }
         finally
         {
@@ -68,9 +79,9 @@ public partial class MainWindow : CustomWindow
         base.OnOpened(e);
         if (_trayIcon is not null) return;
         if (!OperatingSystem.IsWindows() && !OperatingSystem.IsMacOS()) return;
-        var show = new NativeMenuItem("Abrir MusicPlayer2");
+        var show = new NativeMenuItem(Strings.Get("OpenPlayer"));
         show.Click += (_, _) => RestoreWindow();
-        var exit = new NativeMenuItem("Sair");
+        var exit = new NativeMenuItem(Strings.Get("Exit"));
         exit.Click += (_, _) => { _forceExit = true; Close(); };
         var menu = new NativeMenu();
         menu.Items.Add(show);
@@ -124,6 +135,7 @@ public partial class MainWindow : CustomWindow
 
     protected override void OnClosed(EventArgs e)
     {
+        Strings.Changed -= LanguageChanged;
         _trayIcon?.Dispose();
         Player?.Stop();
         base.OnClosed(e);

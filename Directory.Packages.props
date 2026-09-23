@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Avalonia" Version="12.1.1" />
+    <PackageVersion Include="Avalonia.Headless" Version="12.1.1" />
     <PackageVersion Include="Avalonia.Controls.ItemsRepeater" Version="12.0.0" />
     <PackageVersion Include="Avalonia.Themes.Simple" Version="12.1.1" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.1" />

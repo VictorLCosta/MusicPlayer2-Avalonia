@@ -28,7 +28,7 @@
         </Button>
 
         <Button x:Name="ThemeToggleButton" Classes="window-control" Click="ToggleThemeClicked"
-                IsEnabled="{Binding !Settings.IsBusy}" ToolTip.Tip="Trocar tema">
+                IsEnabled="{Binding !Settings.IsBusy}" ToolTip.Tip="{DynamicResource Text.ToggleTheme}">
           <Grid>
             <LucideIcon x:Name="LightThemeIcon" Kind="Sun" Size="16" />
             <LucideIcon x:Name="DarkThemeIcon" Kind="Moon" Size="16" IsVisible="False" />

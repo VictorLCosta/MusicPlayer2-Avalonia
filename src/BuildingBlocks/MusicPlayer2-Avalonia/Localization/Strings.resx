@@ -1,0 +1,309 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <data name="General" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Playback" xml:space="preserve">
+    <value>Playback</value>
+  </data>
+  <data name="MediaLibrary" xml:space="preserve">
+    <value>Media library</value>
+  </data>
+  <data name="Appearance" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="SystemLanguage" xml:space="preserve">
+    <value>System language</value>
+  </data>
+  <data name="BackgroundPlayback" xml:space="preserve">
+    <value>Playback continues in the background. Use Stop in the player to end it.</value>
+  </data>
+  <data name="AddFolder" xml:space="preserve">
+    <value>Add folder</value>
+  </data>
+  <data name="AddMusicFolder" xml:space="preserve">
+    <value>Add music folder</value>
+  </data>
+  <data name="AdjustVolume" xml:space="preserve">
+    <value>Adjust volume</value>
+  </data>
+  <data name="EqualizerHint" xml:space="preserve">
+    <value>Adjust the sound during playback. Changes are saved when you close this dialog.</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="CloseBehavior" xml:space="preserve">
+    <value>When closing the window</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="EnableEqualizer" xml:space="preserve">
+    <value>Enable equalizer</value>
+  </data>
+  <data name="UpdateLibraryOnStartup" xml:space="preserve">
+    <value>Update library on startup</value>
+  </data>
+  <data name="RefreshDevices" xml:space="preserve">
+    <value>Refresh devices</value>
+  </data>
+  <data name="MusicLibrary" xml:space="preserve">
+    <value>Music library</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="SettingsBusy" xml:space="preserve">
+    <value>Loading or saving settings…</value>
+  </data>
+  <data name="LoadSettings" xml:space="preserve">
+    <value>Load settings</value>
+  </data>
+  <data name="Light" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="ContinuePlayback" xml:space="preserve">
+    <value>Keep playing when changing playlists</value>
+  </data>
+  <data name="AccentColor" xml:space="preserve">
+    <value>Accent color</value>
+  </data>
+  <data name="AccentHint" xml:space="preserve">
+    <value>Leave blank to use the theme color.</value>
+  </data>
+  <data name="AudioOutput" xml:space="preserve">
+    <value>Audio output device</value>
+  </data>
+  <data name="ExitApplication" xml:space="preserve">
+    <value>Exit application</value>
+  </data>
+  <data name="Equalizer" xml:space="preserve">
+    <value>Equalizer</value>
+  </data>
+  <data name="Dark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="MissingFilesHint" xml:space="preserve">
+    <value>This option does not delete files from disk.</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="CloseWithoutSaving" xml:space="preserve">
+    <value>Close without saving</value>
+  </data>
+  <data name="Importing" xml:space="preserve">
+    <value>Importing music…</value>
+  </data>
+  <data name="ImportMusic" xml:space="preserve">
+    <value>Import music</value>
+  </data>
+  <data name="RememberPosition" xml:space="preserve">
+    <value>Remember playback position</value>
+  </data>
+  <data name="MaximizeRestore" xml:space="preserve">
+    <value>Maximize or restore</value>
+  </data>
+  <data name="Minimize" xml:space="preserve">
+    <value>Minimize</value>
+  </data>
+  <data name="MinimizeToTray" xml:space="preserve">
+    <value>Minimize to tray</value>
+  </data>
+  <data name="ShowAlbumCover" xml:space="preserve">
+    <value>Show album artwork</value>
+  </data>
+  <data name="ToggleList" xml:space="preserve">
+    <value>Show or hide list</value>
+  </data>
+  <data name="TogglePlaylist" xml:space="preserve">
+    <value>Show or hide playlist</value>
+  </data>
+  <data name="NoTracks" xml:space="preserve">
+    <value>No music found</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="MusicFolders" xml:space="preserve">
+    <value>Music folders</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="SearchMusic" xml:space="preserve">
+    <value>Search music</value>
+  </data>
+  <data name="Playlist" xml:space="preserve">
+    <value>Playlist</value>
+  </data>
+  <data name="PlaybackPosition" xml:space="preserve">
+    <value>Playback position</value>
+  </data>
+  <data name="PreampShort" xml:space="preserve">
+    <value>Preamp</value>
+  </data>
+  <data name="Preamp" xml:space="preserve">
+    <value>Preamplification</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="PreampHint" xml:space="preserve">
+    <value>Lower the preamp if boosting the bands causes distortion.</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="RemoveMissingFiles" xml:space="preserve">
+    <value>Remove references to missing files</value>
+  </data>
+  <data name="TogglePlayback" xml:space="preserve">
+    <value>Play or pause</value>
+  </data>
+  <data name="SettingsSection" xml:space="preserve">
+    <value>Settings section</value>
+  </data>
+  <data name="FollowSystem" xml:space="preserve">
+    <value>Follow system</value>
+  </data>
+  <data name="NoArtwork" xml:space="preserve">
+    <value>No artwork</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="ToggleTheme" xml:space="preserve">
+    <value>Switch theme</value>
+  </data>
+  <data name="MobileImportHint" xml:space="preserve">
+    <value>Use Import music in the player to select files. Copies are stored in the app; originals are unchanged. Copies use storage space and are removed when the app is uninstalled.</value>
+  </data>
+  <data name="BackToPlayer" xml:space="preserve">
+    <value>Back to player</value>
+  </data>
+  <data name="Volume" xml:space="preserve">
+    <value>Volume</value>
+  </data>
+  <data name="ResetEqualizer" xml:space="preserve">
+    <value>Reset adjustments</value>
+  </data>
+  <data name="NoTrackPlaying" xml:space="preserve">
+    <value>No music playing</value>
+  </data>
+  <data name="AllTracks" xml:space="preserve">
+    <value>All music</value>
+  </data>
+  <data name="Folders" xml:space="preserve">
+    <value>Folders</value>
+  </data>
+  <data name="TrackCount" xml:space="preserve">
+    <value>Tracks: {0}</value>
+  </data>
+  <data name="ImportTitle" xml:space="preserve">
+    <value>Import music into the app</value>
+  </data>
+  <data name="Audio" xml:space="preserve">
+    <value>Audio</value>
+  </data>
+  <data name="SelectMusicFolder" xml:space="preserve">
+    <value>Select music folder</value>
+  </data>
+  <data name="SelectMusicFolders" xml:space="preserve">
+    <value>Select music folders</value>
+  </data>
+  <data name="SelectLocalFolder" xml:space="preserve">
+    <value>Select a local folder.</value>
+  </data>
+  <data name="ImportFailed" xml:space="preserve">
+    <value>Could not import music: </value>
+  </data>
+  <data name="ThemeSaveFailed" xml:space="preserve">
+    <value>Could not save the theme. Please try again.</value>
+  </data>
+  <data name="SettingsLoadFailed" xml:space="preserve">
+    <value>Could not load settings. Please try again.</value>
+  </data>
+  <data name="InvalidAccent" xml:space="preserve">
+    <value>Enter a color in #RRGGBB format or leave the field blank.</value>
+  </data>
+  <data name="SettingsSaved" xml:space="preserve">
+    <value>Settings saved.</value>
+  </data>
+  <data name="OutputApplyFailed" xml:space="preserve">
+    <value>Settings were saved, but the audio output could not be changed. Try applying again.</value>
+  </data>
+  <data name="SettingsSaveFailed" xml:space="preserve">
+    <value>Could not save settings. Your changes have been kept so you can try again.</value>
+  </data>
+  <data name="ChangesDiscarded" xml:space="preserve">
+    <value>Changes discarded.</value>
+  </data>
+  <data name="PositionSaveFailed" xml:space="preserve">
+    <value>Could not save the playback position.</value>
+  </data>
+  <data name="Stereo" xml:space="preserve">
+    <value>Stereo</value>
+  </data>
+  <data name="Mono" xml:space="preserve">
+    <value>Mono</value>
+  </data>
+  <data name="FolderPickerUnavailable" xml:space="preserve">
+    <value>Folder selection is unavailable on this platform.</value>
+  </data>
+  <data name="FolderOpenFailed" xml:space="preserve">
+    <value>Could not open the folder. Please try again.</value>
+  </data>
+  <data name="EqualizerApplyFailed" xml:space="preserve">
+    <value>Could not apply the equalizer. Please try adjusting it again.</value>
+  </data>
+  <data name="EqualizerSaveFailed" xml:space="preserve">
+    <value>The adjustment is active, but could not be saved. Close again to retry saving.</value>
+  </data>
+  <data name="SystemOutput" xml:space="preserve">
+    <value>System default</value>
+  </data>
+  <data name="OutputManagedBySystem" xml:space="preserve">
+    <value>Audio output is managed by the system on this platform.</value>
+  </data>
+  <data name="OutputListFailed" xml:space="preserve">
+    <value>Could not list audio outputs. Try refreshing again.</value>
+  </data>
+  <data name="UnavailableOutput" xml:space="preserve">
+    <value>Saved device (unavailable)</value>
+  </data>
+  <data name="OutputUnavailable" xml:space="preserve">
+    <value>The saved device is unavailable. The player will use the default output.</value>
+  </data>
+  <data name="OutputRestoreFailed" xml:space="preserve">
+    <value>Could not restore the saved output. The player will use the default output.</value>
+  </data>
+  <data name="EqualizerRestoreFailed" xml:space="preserve">
+    <value>Could not restore the equalizer. Adjust the controls and close to save again.</value>
+  </data>
+  <data name="EnableDarkTheme">
+    <value>Enable dark theme</value>
+  </data>
+  <data name="EnableLightTheme">
+    <value>Enable light theme</value>
+  </data>
+  <data name="OpenPlayer">
+    <value>Open MusicPlayer2</value>
+  </data>
+  <data name="Exit">
+    <value>Exit</value>
+  </data>
+</root>

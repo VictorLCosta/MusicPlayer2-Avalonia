@@ -6,6 +6,9 @@
     <Nullable>enable</Nullable>
     <HotAvaloniaAutoEnable>false</HotAvaloniaAutoEnable>
     <UseInterpreter>true</UseInterpreter>
+    <!-- Preserve reflection-based dependencies (EF Core, SQLite and TagLibSharp).
+         iOS still requires the linker pipeline, so use copy instead of PublishTrimmed=false. -->
+    <TrimMode>copy</TrimMode>
   </PropertyGroup>
 
   <ItemGroup>

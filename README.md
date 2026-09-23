@@ -4,7 +4,7 @@ A C#/Avalonia reimplementation of [MusicPlayer2](https://github.com/zhongyang219
 
 The original project deserves all the credit for the player this work is based on: its local music workflow, feature set, and interface provide the reference for this migration. So, please visit the [upstream repository](https://github.com/zhongyang219/MusicPlayer2), read its [documentation](https://github.com/zhongyang219/MusicPlayer2/wiki), and support its maintainers. This repository is a separate project maintained by me, [Victor Lima Costa](https://github.com/VictorLCosta).
 
-The current scope is a desktop music player with a shared application core. It does not yet reproduce the full upstream feature set. Mobile and browser hosts explore additional targets, with limitations described below.
+The current implementation includes desktop playback, native Android and iOS audio integrations, a responsive shared interface, and three interface languages. It does not yet reproduce the full upstream feature set. Mobile device validation and the browser workflow have remaining limitations described below.
 
 ## Original application and Avalonia version
 
@@ -16,7 +16,7 @@ The original is a Windows application written in C++ using MFC. Moving to Avalon
 | Platform approach | Windows application | Shared UI and services with Desktop, Android, iOS, and Browser host projects; feature parity and runtime validation vary by target |
 | Audio backend | BASS and FFmpeg playback kernels | Desktop LibVLCSharp, Android MediaPlayer, iOS AVAudioPlayer, and a separate JavaScript backend for the browser |
 | Music library | Local music library and metadata features | Folder scanning, metadata indexing, search, and artist/album navigation backed by EF Core and SQLite |
-| Playback | Local music playback with extensive player options | Play/pause, seek, volume, previous/next, shuffle/repeat, queue services, and saved playback sessions |
+| Playback | Local music playback with extensive player options | Play/pause, seek, volume, previous/next, shuffle/repeat, queue services, saved playback sessions, and horizontal artwork swipes in the mobile layout |
 | Artwork | Cover display and online cover lookup/download | Embedded cover reading through TagLibSharp; no online lookup/download |
 | Spectrum | Audio spectrum visualization | PCM capture, FFT analysis, and a custom Avalonia spectrum control |
 | Appearance | Multiple layouts, theme colors, and XML-customizable interfaces | Avalonia views and styles, light/dark/system themes, and configurable accent color |
@@ -63,6 +63,14 @@ A music player has several related states: the indexed library, ordered queue, c
 
 The difficulty is making those operations agree when files disappear, the playlist changes during playback, or a stored output device is unavailable. For example, the VLC backend falls back to the default output while retaining the user's device preference.
 
+### Integrating mobile playback and file access
+
+Android and iOS select native audio engines through the shared application's platform service registration. The mobile shell handles settings navigation, while each host integrates audio interruptions, background playback, system media controls, and lifecycle checkpoints.
+
+The Android toolbar spectrum reads FFT data from a `Visualizer` attached to the player's own audio session. Android requires the `RECORD_AUDIO` runtime permission for this API; the app requests it on playback and does not open the microphone or save recordings. If permission is denied or the device does not support the effect, playback continues without animated spectrum data.
+
+Mobile file pickers can return streams instead of durable filesystem paths. Imports therefore copy content into private storage before indexing it, handle filename collisions, and clean up interrupted copies. Library operations use separate database scopes from playback, and asynchronous track changes are serialized so UI and system media commands do not prepare competing tracks at the same time.
+
 ### Adapting persistence and playback to the browser
 
 The browser cannot use the native desktop audio and filesystem paths unchanged. Its host supplies a JavaScript audio engine and IndexedDB-backed storage behind shared interfaces.
@@ -73,9 +81,15 @@ This adaptation is still incomplete at the application level: the browser audio 
 
 ## Platform status
 
+### Interface language
+
+The shared interface supports English, Brazilian Portuguese, and Simplified Chinese. Choose **Settings → General → Language** and click **Apply** to switch without restarting. The selection is saved; **System language** uses the device language when supported and falls back to English. Translation resources and contributor instructions are in [Localization](src/BuildingBlocks/MusicPlayer2-Avalonia/Localization/README.md).
+
+The ResX resources cover player controls, settings, library labels, equalizer controls, file-picker prompts, and interface messages. Existing views update when the language changes. Song metadata, filenames, and device names retain their original values.
+
 ### Using the desktop equalizer
 
-Open **Equalizador** from the sliders button beside Settings in the player toolbar. Enable it and adjust the ten frequency bands or preamp between -12 and +12 dB. Changes apply immediately, including during playback. Disable it to bypass processing without losing the curve, or use **Zerar ajustes** to return the bands and preamp to 0 dB. Lower the preamp if boosted bands cause distortion.
+Open **Equalizer** from the sliders button beside Settings in the player toolbar. Enable it and adjust the ten frequency bands or preamp between -12 and +12 dB. Changes apply immediately, including during playback. Disable it to bypass processing without losing the curve, or use **Reset adjustments** to return the bands and preamp to 0 dB. Lower the preamp if boosted bands cause distortion.
 
 Closing the dialog saves the settings in `equalizer.json` in the application storage directory. They are restored before playback on the next launch. If saving fails, the dialog offers a retry or closing without saving. A shared editor can also be hosted inside the mobile shell; the button remains disabled when the audio backend does not implement equalization.
 
@@ -88,13 +102,17 @@ Closing the dialog saves the settings in `equalizer.json` in the application sto
 
 ### Mobile usage and remaining validation
 
-Use **Importar músicas** in the player to select one or more files. The app copies their contents into private storage and indexes those copies, so playback does not depend on retaining a document-provider URI permission. Originals are untouched. Importing the same content under the same filename reuses the existing copy. Copies occupy device storage and are removed when the app is uninstalled.
+Use **Import music** in the player to select one or more files. The app copies their contents into private storage and indexes those copies, so playback does not depend on retaining a document-provider URI permission. Originals are untouched. Importing the same content under the same filename reuses the existing copy. Copies occupy device storage and are removed when the app is uninstalled.
+
+In the mobile layout, swipe horizontally across the album artwork to change tracks. The current gesture mapping is **left for previous** and **right for next**. The gesture uses the same playback commands as the transport buttons.
 
 The mobile audio engines use system codecs, so they do not promise the same format coverage as desktop VLC. The current native engines do not implement the equalizer, audio spectrum, or manual output-device selection. Output routing is controlled by the operating system.
 
-The implementation includes background playback and controls, but these still need end-to-end validation on real Android/iOS devices: import from local/cloud document providers, screen locking, incoming calls, Bluetooth/headphone disconnection, process recreation, safe-area layout, and release builds. A successful build alone is not a device compatibility claim. See [mobile validation](docs/MOBILE_VALIDATION.md) for commands and the acceptance checklist.
+The implementation includes background playback and controls, but these still need end-to-end validation on real Android/iOS devices: import from local/cloud document providers, screen locking, incoming calls, Bluetooth/headphone disconnection, process recreation, safe-area layout, and release builds. A successful build alone is not a device compatibility claim.
 
 ## Credits and licensing
+
+My thanks to the **Avalonia team** for organizing the Avalonia Port Challenge and giving me the opportunity to participate. Rebuilding this player has been a valuable opportunity to learn, explore cross-platform development, and put Avalonia into practice.
 
 Credit for the original MusicPlayer2 belongs to **zhongyang219 and the upstream contributors**. Its [license](https://github.com/zhongyang219/MusicPlayer2/blob/master/LICENSE) is GNU GPL v3. This repository currently contains an [MIT license file](LICENSE); that file does not relicense upstream code or assets. These references describe the files in the two repositories, not a completed audit of source or asset provenance.
 
@@ -108,6 +126,8 @@ This implementation also uses Avalonia, CommunityToolkit.Mvvm, LibVLCSharp/LibVL
 - `src/BuildingBlocks/MusicPlayer2-Avalonia.Infrastructure`: infrastructure and service implementations.
 - `src/Hosts/Desktop`: desktop host targeting Windows, macOS, and Linux.
 - `src/Hosts/Android`, `src/Hosts/iOS`, and `src/Hosts/Browser`: additional hosts for running the shared application on mobile devices and in the browser.
+- `src/BuildingBlocks/MusicPlayer2-Avalonia/Localization`: English, Brazilian Portuguese, and Simplified Chinese resources and runtime language switching.
+- `tests`: executable checks for localization, mobile imports and playback concurrency, and the desktop equalizer.
 
 ## Development
 
@@ -123,3 +143,42 @@ To build the entire solution, including the mobile and browser hosts, install th
 ```sh
 dotnet build MusicPlayer2-Avalonia.slnx
 ```
+
+### Mobile release builds
+
+Mobile hosts currently preserve managed code because the Avalonia XAML dependency metadata and the reflection-based EF Core, SQLite and TagLibSharp dependencies have not been validated with trimming. Android disables `PublishTrimmed` and `RunAOTCompilation` (Android AOT requires trimming). iOS uses `TrimMode=copy` to preserve assemblies while retaining the required Apple linker pipeline. Compiler warnings still fail the build.
+
+This compatibility configuration trades package size and Android AOT startup optimizations for preserving code used at runtime. Re-enable trimming only after resolving linker diagnostics and testing imports, database access, metadata reading and playback on devices. iOS native linking and signing must be validated on macOS.
+
+### Android debugging in VS Code
+
+The repository includes **Debug - Desktop** and **Debug - Android** profiles in [launch.json](.vscode/launch.json). Android debugging requires the Android workload and SDK, the **Mono Debug** extension (`ms-vscode.mono-debug`), and an authorized device or emulator.
+
+Enable USB debugging on the phone, connect it, accept the computer's authorization prompt, and check the connection:
+
+```sh
+adb devices
+```
+
+The device must appear as `device`, not `unauthorized`. Select **Debug - Android** and press **F5**. Its pre-launch task builds, installs, and starts the app with the debugger enabled, then attaches on port 10000. Keep one target connected for this default configuration.
+
+The Android debug APK includes its managed assemblies for direct installation without IDE fast deployment. Building the Android host in Debug produces `src/Hosts/Android/bin/Debug/net10.0-android/io.github.victorlcosta.musicplayer2-Signed.apk`. This is a development package, not a store release; the device validation items are listed under **Mobile usage and remaining validation** above.
+
+### Automated checks
+
+Run from the repository root:
+
+```sh
+dotnet run --project tests/LocalizationChecks
+dotnet run --project tests/MobileChecks
+```
+
+Localization checks verify translation completeness, loading of language resources, live updates in an existing view, fallback, applying/canceling changes, and saved language preferences. Mobile checks cover provider streams, import integrity and cancellation, duplicate handling, SQLite indexing, and concurrent playback requests.
+
+The equalizer checks require native LibVLC. After building the desktop host on Windows:
+
+```sh
+dotnet run --project tests/EqualizerChecks -- src/Hosts/Desktop/bin/Debug/net10.0/libvlc/win-x64
+```
+
+These checks exercise saved settings and actual decoded PCM to verify equalizer gain and bypass behavior. Successful automated checks and builds do not replace testing audio, gestures, layout, and lifecycle behavior on physical devices.

@@ -16,12 +16,17 @@
                         IsVisible="{Binding Artwork, ElementName=Root, Converter={x:Static ObjectConverters.IsNull}}">
               <LucideIcon Kind="Music" Size="30" Foreground="{DynamicResource Theme.Brush.TextMuted}"
                         HorizontalAlignment="Center" />
-              <TextBlock Text="Sem capa" FontSize="16" Opacity="0.6" HorizontalAlignment="Center" />
+              <TextBlock Text="{DynamicResource Text.NoArtwork}" FontSize="16" Opacity="0.6" HorizontalAlignment="Center" />
             </StackPanel>
             <Image Source="{Binding Artwork, ElementName=Root}" Stretch="UniformToFill" />
           </Grid>
         </Border>
-        <TextBlock Text="{Binding CurrentTrack.Title, ElementName=Root, TargetNullValue='Nenhuma música em reprodução'}"
+        <TextBlock Text="{DynamicResource Text.NoTrackPlaying}"
+                  IsVisible="{Binding CurrentTrack, ElementName=Root, Converter={x:Static ObjectConverters.IsNull}}"
+                  FontSize="15" TextAlignment="Center" TextWrapping="Wrap"
+                  Foreground="{DynamicResource Theme.Brush.Text}" />
+        <TextBlock Text="{Binding CurrentTrack.Title, ElementName=Root}"
+                  IsVisible="{Binding CurrentTrack, ElementName=Root, Converter={x:Static ObjectConverters.IsNotNull}}"
                   FontSize="15" TextAlignment="Center" TextWrapping="Wrap"
                   Foreground="{DynamicResource Theme.Brush.Text}" />
         <TextBlock Text="{Binding CurrentTrack.ArtistName, ElementName=Root}"
@@ -39,7 +44,7 @@
                 TextAlignment="Center" />
     </Grid>
     <Grid Classes="player-mobile" RowDefinitions="*,Auto" ClipToBounds="True">
-      <Border Background="{DynamicResource Theme.Brush.Cover}"
+      <Border ClipToBounds="True" Background="{DynamicResource Theme.Brush.Cover}"
               IsVisible="{Binding ShowAlbumCover, ElementName=Root}"
               b:EventBindingBehavior.EventName="SwipeGestureEnded"
               b:EventBindingBehavior.PassEventArgsToCommand="True"
@@ -52,20 +57,28 @@
           <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"
                       IsVisible="{Binding Artwork, ElementName=Root, Converter={x:Static ObjectConverters.IsNull}}">
             <LucideIcon Kind="Music" Size="64" HorizontalAlignment="Center" />
-            <TextBlock Text="Sem capa" HorizontalAlignment="Center" />
+            <TextBlock Text="{DynamicResource Text.NoArtwork}" HorizontalAlignment="Center" />
           </StackPanel>
-          <Image Source="{Binding Artwork, ElementName=Root}" Stretch="UniformToFill" />
+          <Image Source="{Binding Artwork, ElementName=Root}" Stretch="UniformToFill" Margin="-24" Opacity="0.55">
+            <Image.Effect><BlurEffect Radius="24" /></Image.Effect>
+          </Image>
+          <Image Source="{Binding Artwork, ElementName=Root}" Stretch="Uniform" />
         </Grid>
       </Border>
-      <Border VerticalAlignment="Bottom" Background="#80000000" Padding="24,12,24,16">
+      <Border VerticalAlignment="Bottom" Background="#80000000" Padding="16,10,16,12">
         <StackPanel Spacing="4">
           <TextBlock Text="{Binding CurrentTrack.ArtistName, ElementName=Root}"
                      Foreground="White" FontSize="14" TextTrimming="CharacterEllipsis" />
-          <TextBlock Text="{Binding CurrentTrack.Title, ElementName=Root, TargetNullValue='Nenhuma música em reprodução'}"
+          <TextBlock Text="{DynamicResource Text.NoTrackPlaying}"
+                     IsVisible="{Binding CurrentTrack, ElementName=Root, Converter={x:Static ObjectConverters.IsNull}}"
+                     Foreground="White" FontSize="22" TextTrimming="CharacterEllipsis" />
+          <TextBlock Text="{Binding CurrentTrack.Title, ElementName=Root}"
+                     IsVisible="{Binding CurrentTrack, ElementName=Root, Converter={x:Static ObjectConverters.IsNotNull}}"
                      Foreground="White" FontSize="22" TextTrimming="CharacterEllipsis" />
         </StackPanel>
       </Border>
       <TextBlock Grid.Row="1" Text="{Binding ErrorMessage, ElementName=Root}"
+                 IsVisible="{Binding ErrorMessage, ElementName=Root, Converter={x:Static ObjectConverters.IsNotNull}}"
                  Foreground="{DynamicResource Theme.Brush.Danger}" TextWrapping="Wrap"
                  TextAlignment="Center" />
   </Grid>  

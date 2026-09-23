@@ -32,13 +32,14 @@ internal sealed partial class SettingsViewModel : ViewModelBase
         MediaLibrary = mediaLibrary;
 
         SettingsMenuItems = [
-            new("Geral", "Settings", () => General),
-            new("Reprodução", "Play", () => Playback),
-            new("Biblioteca de mídia", "Library", () => MediaLibrary),
-            new("Aparência", "Palette", () => Appearance)
+            new(Strings.Get("General"), "Settings", () => General),
+            new(Strings.Get("Playback"), "Play", () => Playback),
+            new(Strings.Get("MediaLibrary"), "Library", () => MediaLibrary),
+            new(Strings.Get("Appearance"), "Palette", () => Appearance)
         ];
 
         SelectedMenuItem = SettingsMenuItems[0];
+        Strings.Changed += LanguageChanged;
     }
 
     public AppearanceSettingsViewModel Appearance { get; }
@@ -46,7 +47,27 @@ internal sealed partial class SettingsViewModel : ViewModelBase
     public PlaybackSettingsViewModel Playback { get; }
     public MediaLibrarySettingsViewModel MediaLibrary { get; }
 
-    public IReadOnlyList<MenuItem> SettingsMenuItems { get; }
+    public IReadOnlyList<MenuItem> SettingsMenuItems { get; private set; }
+
+    private void LanguageChanged(object? sender, EventArgs e)
+    {
+        var selected = SelectedMenuItem?.Icon;
+        SettingsMenuItems = [
+            new(Strings.Get("General"), "Settings", () => General),
+            new(Strings.Get("Playback"), "Play", () => Playback),
+            new(Strings.Get("MediaLibrary"), "Library", () => MediaLibrary),
+            new(Strings.Get("Appearance"), "Palette", () => Appearance)
+        ];
+        OnPropertyChanged(nameof(SettingsMenuItems));
+        SelectedMenuItem = SettingsMenuItems.FirstOrDefault(item => item.Icon == selected) ?? SettingsMenuItems[0];
+        Playback.RefreshAudioDevices();
+    }
+
+    public override void Dispose()
+    {
+        Strings.Changed -= LanguageChanged;
+        base.Dispose();
+    }
 
     public ViewModelBase? CurrentPage => SelectedMenuItem?.CreatePage();
 
@@ -100,7 +121,7 @@ internal sealed partial class SettingsViewModel : ViewModelBase
         }
         catch (Exception)
         {
-            ErrorMessage = "Não foi possível carregar as configurações. Tente novamente.";
+            ErrorMessage = Strings.Get("SettingsLoadFailed");
         }
         finally
         {
@@ -119,13 +140,14 @@ internal sealed partial class SettingsViewModel : ViewModelBase
         if (accentColor is not null && (accentColor.Length != 7 || accentColor[0] != '#' ||
             !accentColor.Skip(1).All(char.IsAsciiHexDigit)))
         {
-            ErrorMessage = "Informe a cor no formato #RRGGBB ou deixe o campo em branco.";
+            ErrorMessage = Strings.Get("InvalidAccent");
             return;
         }
 
         var settings = _savedSettings with
         {
             CloseBehavior = General.CloseBehavior,
+            Language = General.Language == "system" ? null : General.Language,
             AudioOutputDeviceId = NormalizeOptionalText(Playback.AudioOutputDeviceId),
             RememberPlaybackPosition = Playback.RememberPlaybackPosition,
             ContinuePlaybackOnPlaylistChange = Playback.ContinuePlaybackOnPlaylistChange,
@@ -141,21 +163,22 @@ internal sealed partial class SettingsViewModel : ViewModelBase
         try
         {
             await _settingsService.SaveAsync(settings);
+            Strings.Apply(settings.Language);
             _savedSettings = settings;
             RestoreSettings(settings);
-            StatusMessage = "Configurações salvas.";
+            StatusMessage = Strings.Get("SettingsSaved");
             try
             {
                 Playback.ApplyAudioOutput();
             }
             catch (Exception)
             {
-                ErrorMessage = "As configurações foram salvas, mas não foi possível trocar a saída de áudio. Tente aplicar novamente.";
+                ErrorMessage = Strings.Get("OutputApplyFailed");
             }
         }
         catch (Exception)
         {
-            ErrorMessage = "Não foi possível salvar as configurações. Suas alterações foram mantidas para tentar novamente.";
+            ErrorMessage = Strings.Get("SettingsSaveFailed");
         }
         finally
         {
@@ -170,12 +193,13 @@ internal sealed partial class SettingsViewModel : ViewModelBase
 
         RestoreSettings(_savedSettings);
         ErrorMessage = null;
-        StatusMessage = "Alterações descartadas.";
+        StatusMessage = Strings.Get("ChangesDiscarded");
     }
 
     private void RestoreSettings(AppSettings settings)
     {
         General.CloseBehavior = settings.CloseBehavior;
+        General.Language = settings.Language is null ? "system" : Strings.ResolveCulture(settings.Language).Name;
         Playback.AudioOutputDeviceId = settings.AudioOutputDeviceId;
         Playback.RememberPlaybackPosition = settings.RememberPlaybackPosition;
         Playback.ContinuePlaybackOnPlaylistChange = settings.ContinuePlaybackOnPlaylistChange;

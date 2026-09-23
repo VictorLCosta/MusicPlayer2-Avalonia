@@ -146,6 +146,8 @@ dotnet build MusicPlayer2-Avalonia.slnx
 
 ### Mobile release builds
 
+The **Publish Platforms** workflow produces tester downloads without signing secrets: a development-signed Android APK and an iOS simulator app for Apple Silicon Macs. The iOS artifact is not installable on physical iPhones. See [mobile testing instructions](docs/mobile-testing.md) for installation and Android update limitations. Store releases and physical iPhone distribution require a separate signing setup.
+
 The VLC backend and its `LibVLCSharp` dependency live in `MusicPlayer2-Avalonia.Infrastructure.Desktop`, referenced only by the Desktop host and its equalizer checks. Shared infrastructure does not register an audio engine; each host registers its own. This keeps VLC native framework requirements out of iOS, Android and Browser builds.
 
 Mobile hosts currently preserve managed code because the Avalonia XAML dependency metadata and the reflection-based EF Core, SQLite and TagLibSharp dependencies have not been validated with trimming. Android disables `PublishTrimmed` and `RunAOTCompilation` (Android AOT requires trimming). iOS uses `TrimMode=copy` to preserve assemblies while retaining the required Apple linker pipeline. Compiler warnings still fail the build.
